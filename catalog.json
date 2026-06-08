@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "SchooMy 提案アセットカタログ（マスター）",
-    "version": "v1.0",
+    "version": "v1.1",
     "updated": "2026-06-08",
     "sourceSheet": "1u7gmxyvmV8j5AbgBKDk37v5LJXYNpAA6UsoF2nVMaZU",
     "diveSheet": "13yXVppzgcE0NyY0ATZ7JdiCaYtNzBJ4wMVH_1HBEopk",
@@ -611,20 +611,6 @@
       "note": null
     },
     {
-      "model": "S-MZ-A01",
-      "type": "教材",
-      "name": "みんなのダイブ特集号 Unityでゲームをつくろう",
-      "category": "教材",
-      "priceExTax": 1500,
-      "priceIncTax": 1650,
-      "jan": null,
-      "can": "角度・加速度センサー",
-      "legacyName": null,
-      "photoFileId": null,
-      "image": null,
-      "note": "デザインシート未掲載（表紙ID要確認）"
-    },
-    {
       "model": "S-MZ-A02",
       "type": "教材",
       "name": "みんなのダイブ 土壌水分を測りに行こう初回増量",
@@ -695,34 +681,6 @@
       "note": null
     },
     {
-      "model": "S-MZ-A07",
-      "type": "教材",
-      "name": "みんなのダイブ特集号 はじめての計測と制御",
-      "category": "教材",
-      "priceExTax": 1500,
-      "priceIncTax": 1650,
-      "jan": null,
-      "can": "",
-      "legacyName": null,
-      "photoFileId": null,
-      "image": null,
-      "note": "デザインシート未掲載"
-    },
-    {
-      "model": "S-MZ-A08",
-      "type": "教材",
-      "name": "みんなのダイブ特集号 はじめてのコネクター活用2025",
-      "category": "教材",
-      "priceExTax": 1500,
-      "priceIncTax": 1650,
-      "jan": null,
-      "can": "",
-      "legacyName": null,
-      "photoFileId": null,
-      "image": null,
-      "note": "デザインシート未掲載"
-    },
-    {
       "model": "S-MZ-A09",
       "type": "教材",
       "name": "みんなのダイブ特集号 はじめてのセンサーと測定",
@@ -735,20 +693,6 @@
       "photoFileId": "1PkMOuoY8r_q3hQuVlPGmH4C0LseZ5841",
       "image": "img/S-MZ-A09.png",
       "note": null
-    },
-    {
-      "model": "S-MZ-A10",
-      "type": "教材",
-      "name": "みんなのダイブ特集号 はじめてのIoTシステム",
-      "category": "教材",
-      "priceExTax": 1500,
-      "priceIncTax": 1650,
-      "jan": null,
-      "can": "",
-      "legacyName": null,
-      "photoFileId": null,
-      "image": null,
-      "note": "デザインシート未掲載"
     },
     {
       "model": "S-MZ-A11",
