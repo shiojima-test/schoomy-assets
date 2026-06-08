@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""catalog.json builder (source sheet: 1u7gmxyvmV8j5AbgBKDk37v5LJXYNpAA6UsoF2nVMaZU)."""
-import json
+"""catalog.json builder.
+
+製品マスター: source sheet 1u7gmxyvmV8j5AbgBKDk37v5LJXYNpAA6UsoF2nVMaZU（下記 ROWS に固定）。
+ダイブ詳細  : dive_master.json（Google Sheet「月刊みんなのダイブ_デザインリスト」
+              ID 13yXVppzgcE0NyY0ATZ7JdiCaYtNzBJ4wMVH_1HBEopk の全項目スナップショット）を
+              各 S-MZ 製品の "dive" に丸ごと保持する。
+ビルド時もシートを読まずローカルの dive_master.json で完結（提案生成も catalog.json のみ参照）。
+"""
+import json, os
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # (type, model, name, category, exTax, incTax, jan, can, legacyName, fileId, note)
 ROWS = [
@@ -65,31 +74,49 @@ ROWS = [
 ("教材","S-MZ-A19","みんなのダイブ特集号 ウェブでデータを比べよう","教材",1500,1650,"4573676921260","ピックアップ:明るさセンサー","","1gGwOhedHoz9oKzBorspwjuBFb1r93Emf",""),
 ]
 
+def load_dive_master():
+    """dive_master.json（ダイブ全項目スナップショット）を model→dict で返す。無ければ空。"""
+    p=os.path.join(ROOT,"dive_master.json")
+    if not os.path.exists(p):
+        print("⚠ dive_master.json が見つかりません。ダイブ詳細なしで生成します。")
+        return {}, {}
+    d=json.load(open(p,encoding="utf-8"))
+    return d.get("byModel",{}), d
+
 def main():
+    dive_by_model, dive_doc = load_dive_master()
     products = []
     for t,model,name,cat,ex,inc,jan,can,legacy,fid,note in ROWS:
-        products.append({
+        rec = {
             "model": model, "type": t, "name": name, "category": cat,
             "priceExTax": ex, "priceIncTax": inc, "jan": jan or None,
             "can": can, "legacyName": legacy or None,
             "photoFileId": fid or None,
             "image": f"img/{model}.png" if fid else None,
             "note": note or None,
-        })
+        }
+        if model in dive_by_model:
+            # ダイブ号は全項目を dive にそのまま保持（表示側で必要分だけ抜き出す）
+            rec["dive"] = dive_by_model[model]
+        products.append(rec)
     doc = {
         "meta": {
             "title": "SchooMy 提案アセットカタログ（マスター）",
-            "version": "v1.1", "updated": "2026-06-08",
+            "version": "v1.3", "updated": "2026-06-08",
             "sourceSheet": "1u7gmxyvmV8j5AbgBKDk37v5LJXYNpAA6UsoF2nVMaZU",
             "diveSheet": "13yXVppzgcE0NyY0ATZ7JdiCaYtNzBJ4wMVH_1HBEopk",
+            "diveFields": dive_doc.get("fields"),
+            "diveFieldsJa": dive_doc.get("fieldsJa"),
             "joinKey": "model",
         },
         "products": products,
     }
-    with open("catalog.json","w",encoding="utf-8") as f:
+    with open(os.path.join(ROOT,"catalog.json"),"w",encoding="utf-8") as f:
         json.dump(doc,f,ensure_ascii=False,indent=2)
     miss=[p["model"] for p in products if not p["photoFileId"]]
-    print("products:",len(products),"| with photo:",sum(1 for p in products if p['photoFileId']),"| no photo:",miss)
+    nd=sum(1 for p in products if p.get("dive"))
+    print("products:",len(products),"| with photo:",sum(1 for p in products if p['photoFileId']),
+          "| with dive:",nd,"| no photo:",miss)
 
 if __name__=="__main__":
     main()
