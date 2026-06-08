@@ -5,15 +5,14 @@ build_proposal.py — SchooMy 写真入り提案書HTML自動生成（柔軟版�
 
 使い方:
   python build_proposal.py --tools オレンジボード2,加速度センサー,スイッチ,湿度センサー,OLED,延長ケーブル,書き込み機2 \
-      --magazines 冷蔵庫,通学路 --ver v1.7
+      --magazines 冷蔵庫,通学路 --ver v1.6
 
 設計方針:
-- 既定は self-contained HTML 1枚のみを出力（写真base64・フォント埋め込み・右上ロゴ）。**PDFは作らない**。
-  PDF生成は --pdf を明示したときだけ。未指定では Playwright/Chromium 等の重い処理も一切走らせない。
+- 既定は self-contained HTML 1枚を出力（写真base64・フォント埋め込み・右上ロゴ）。出力はHTMLのみ。
 - 出力は「1枚物の縦長Webページ」。A4・@page・改ページは使わず、固定高さも作らない。
-  ヘッダー（濃紺バンド＋右上ロゴ＋直下オレンジ細ライン）は最上部に1回、フッター（濃紺・問い合わせ）は最下部に1回だけ。
+  ヘッダー（黒バンド＋右上ロゴ＋オレンジサブバー）は最上部に1回、フッターは最下部に1回だけ。
   コンテンツは中央寄せ（max-width 980px）・背景white基調・レスポンシブで、内容に応じて連続して伸びる。
-  ※A4 PDFへの書き出しはデザイン確定後に --pdf で対応（render_pdf は温存。既定では呼ばない）。
+  ※A4 PDFへの書き出しはデザイン確定後に別途対応する（render_pdf は将来用に温存。既定では呼ばない）。
 - 入力は型番でも製品名でも可。表記ゆれ・部分一致で catalog.json から型番に解決（柔軟な名前解決）。
   ダイブ号は号名・通称・キーワード（例「冷蔵庫」「通学路」「p5.js」）でも解決。
   一意に決まらない場合は候補を提示して安全に停止（誤った型番を確定しない）。
@@ -194,25 +193,6 @@ def build_html(items, ver, title, logo_uri=None, contact=None):
     mags =[p for p in items if is_magazine(p)]
     contact=contact or DEFAULT_CONTACT
 
-    used=set(title)
-    for p in items:
-        for k in ("model","name","can","jan"):
-            v=p.get(k)
-            if v: used.update(str(v))
-        d=p.get("dive") or {}
-        for k in ("headline","pickupSensor","subjects","grades"):
-            if d.get(k): used.update(str(d[k]))
-    used.update("ご提案書株式会社スクーミーツール教材月刊みんなのダイブ価格構成合計税抜税込点内容のご案内"
-                "ピックアップ写真未登録項目数本書はに関するです年月日単価小計数量ご対象学年情報数学理科化学英語")
-    # ヘッダー/フッターの固定文言（M PLUS サブセットに確実に含める：問い合わせ・社名・ドメイン・記号・英数）
-    used.update("お問い合わせ営業担当TELEmail © SchooMy, Inc. 株式会社スクーミー fox.schoomy.com 開発事業紹介"
-                "@:/.-_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-    used.update(str(contact.get("person","")))
-    used.update(str(contact.get("tel","")))
-    used.update(str(contact.get("email","")))
-    reg=subset_font_face(os.path.join(ROOT,"fonts","MPLUS1p-Regular.ttf"),used,"MPLUS1p",400)
-    bold=subset_font_face(os.path.join(ROOT,"fonts","MPLUS1p-Bold.ttf"),used,"MPLUS1p",700)
-
     ex=sum(p['priceExTax']*p['_qty'] for p in items)
     inc=sum(p['priceIncTax']*p['_qty'] for p in items)
     total_qty=sum(p['_qty'] for p in items)
@@ -224,7 +204,73 @@ def build_html(items, ver, title, logo_uri=None, contact=None):
                f"<td class='r'>{q}</td><td class='r'>{yen(p['priceExTax']*q)}</td>"
                f"<td class='r'>{yen(p['priceIncTax']*q)}</td></tr>")
 
+    # ---- 本文セクション（フォントに依存しないHTML断片を先に組み立てる）----
+    sections=""
+    # 1) サマリ（必ず表示）
+    sections+=f"""<section>
+  <p class="lead">本書は、株式会社スクーミーの教育用ツールおよび教材「月刊みんなのダイブ」に関するご提案です。選定いただいた構成（全{total_qty}点）の内容と価格を以下にまとめております。</p>
+  <table class="sum"><tr><th>型番</th><th>品名</th><th class="r">数量</th><th class="r">税抜</th><th class="r">税込</th></tr>{rows}</table>
+  <div class="total"><div class="lab">合計（{total_qty}点）</div><div><span class="ex">税抜 {yen(ex)}</span><span class="inc">税込 {yen(inc)}</span></div></div>
+</section>"""
+    # 2) ツール（あれば）
+    if tools:
+        cards="".join(product_card(p) for p in tools)
+        sections+=f"""<section>
+  <div class="secbar">ご提案内容｜ツール</div>
+  <div class="secttl">オレンジボードと各種コネクター</div>
+  <div class="cards">{cards}</div>
+</section>"""
+    # 3) 教材（あれば）
+    if mags:
+        cards="".join(product_card(p) for p in mags)
+        sections+=f"""<section>
+  <div class="secbar">ご提案内容｜教材（月刊みんなのダイブ）</div>
+  <div class="secttl">授業でそのまま使える教材誌</div>
+  <div class="cards">{cards}</div>
+</section>"""
+
+    person=html.escape(str(contact.get("person","")))
+    tel=html.escape(str(contact.get("tel","")))
+    email=html.escape(str(contact.get("email","")))
+    footer=f"""<footer class="foot">
+  <div class="foot-contact">
+    <span class="foot-label">お問い合わせ</span>
+    <span class="foot-cinfo">営業担当：{person}　<span class="o">TEL {tel}</span>　<span class="o">Email {email}</span></span>
+  </div>
+  <div class="foot-copy">
+    <span>© SchooMy, Inc. 株式会社スクーミー</span>
+    <span class="dom">fox.schoomy.com</span>
+  </div>
+</footer>"""
+
     logo_html=f'<img class="hlogo" src="{logo_uri}" alt="SchooMy">' if logo_uri else ''
+    header=f'<header class="hband"><div class="htitle">{html.escape(title)}<span class="hver">{html.escape(ver)}</span></div>{logo_html}</header>'
+    subbar=f'<div class="subbar">ご提案内容のご案内　{html.escape(ver)}</div>'
+    body=f"""<div class="wrap">
+{header}
+{subbar}
+<main class="doc">
+{sections}
+</main>
+{footer}
+</div>"""
+
+    # ---- フォント・サブセット：画面に出る文字を本文HTMLから自動抽出してから絞り込む ----
+    # タグ（<...>）を除去して可視テキストだけを取り出し（src等のbase64は除外）→ 実体参照を復元 →
+    # 文字集合化。これにより見出し・帯・表ヘッダ・リード文を将来変更しても取りこぼさず、
+    # 「サブセットに無い字が別フォント/豆腐へフォールバック＝文字化け」の再発を防ぐ。
+    visible=html.unescape(re.sub(r"<[^>]+>","",body))
+    used=set(visible)
+    used.update(title); used.update(ver)
+    # 安全網：英数・記号・問い合わせ先（プレースホルダ画像やフォールバック描画用）
+    used.update("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                "@:/.-_（）()／/・,.-×￥円｜％%　 ")
+    for k in ("person","tel","email"):
+        used.update(str(contact.get(k,"")))
+
+    reg=subset_font_face(os.path.join(ROOT,"fonts","MPLUS1p-Regular.ttf"),used,"MPLUS1p",400)
+    bold=subset_font_face(os.path.join(ROOT,"fonts","MPLUS1p-Bold.ttf"),used,"MPLUS1p",700)
+
     css=f"""
 {reg}
 {bold}
@@ -296,54 +342,10 @@ table.sum td.m{{color:{BLUE};font-weight:700;white-space:nowrap}}
   .card.mag .thumb{{width:100%;height:auto;aspect-ratio:3/4;flex:none}}
 }}
 """
-    sections=""
-    # 1) サマリ（必ず表示）
-    sections+=f"""<section>
-  <p class="lead">本書は、株式会社スクーミーの教育用ツールおよび教材「月刊みんなのダイブ」に関するご提案です。選定いただいた構成（全{total_qty}点）の内容と価格を以下にまとめております。</p>
-  <table class="sum"><tr><th>型番</th><th>品名</th><th class="r">数量</th><th class="r">税抜</th><th class="r">税込</th></tr>{rows}</table>
-  <div class="total"><div class="lab">合計（{total_qty}点）</div><div><span class="ex">税抜 {yen(ex)}</span><span class="inc">税込 {yen(inc)}</span></div></div>
-</section>"""
-    # 2) ツール（あれば）
-    if tools:
-        cards="".join(product_card(p) for p in tools)
-        sections+=f"""<section>
-  <div class="secbar">ご提案内容｜ツール</div>
-  <div class="secttl">オレンジボードと各種コネクター</div>
-  <div class="cards">{cards}</div>
-</section>"""
-    # 3) 教材（あれば）
-    if mags:
-        cards="".join(product_card(p) for p in mags)
-        sections+=f"""<section>
-  <div class="secbar">ご提案内容｜教材（月刊みんなのダイブ）</div>
-  <div class="secttl">授業でそのまま使える教材誌</div>
-  <div class="cards">{cards}</div>
-</section>"""
-
-    person=html.escape(str(contact.get("person","")))
-    tel=html.escape(str(contact.get("tel","")))
-    email=html.escape(str(contact.get("email","")))
-    footer=f"""<footer class="foot">
-  <div class="foot-contact">
-    <span class="foot-label">お問い合わせ</span>
-    <span class="foot-cinfo">営業担当：{person}　<span class="o">TEL {tel}</span>　<span class="o">Email {email}</span></span>
-  </div>
-  <div class="foot-copy">
-    <span>© SchooMy, Inc. 株式会社スクーミー</span>
-    <span class="dom">fox.schoomy.com</span>
-  </div>
-</footer>"""
     return f"""<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)} {html.escape(ver)}</title><style>{css}</style></head><body>
-<div class="wrap">
-<header class="hband"><div class="htitle">{html.escape(title)}<span class="hver">{html.escape(ver)}</span></div>{logo_html}</header>
-<div class="subbar">ご提案内容のご案内　{html.escape(ver)}</div>
-<main class="doc">
-{sections}
-</main>
-{footer}
-</div>
+{body}
 </body></html>"""
 
 def render_pdf(html_path, pdf_path):
@@ -362,7 +364,7 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--tools",default="")
     ap.add_argument("--magazines",default="")
-    ap.add_argument("--ver",default="v1.7")
+    ap.add_argument("--ver",default="v1.6")
     ap.add_argument("--title",default="ご提案書")
     ap.add_argument("--catalog",default=os.path.join(ROOT,"catalog.json"))
     ap.add_argument("--imgdir",default="img")
@@ -371,8 +373,7 @@ def main():
     ap.add_argument("--contact-person",default=DEFAULT_CONTACT["person"])
     ap.add_argument("--contact-tel",default=DEFAULT_CONTACT["tel"])
     ap.add_argument("--contact-email",default=DEFAULT_CONTACT["email"])
-    ap.add_argument("--pdf",action="store_true",
-                    help="このフラグを付けたときだけPDFを生成。既定はHTMLのみ（Chromiumも起動しない）")
+    ap.add_argument("--pdf",action="store_true",help="PDFも出力（既定はHTMLのみ）")
     a=ap.parse_args()
     doc,cat=load_catalog(a.catalog)
     contact={"person":a.contact_person,"tel":a.contact_tel,"email":a.contact_email}
@@ -400,12 +401,9 @@ def main():
     open(hp,"w",encoding="utf-8").write(html_str)
     print("HTML:",hp,f"({len(html_str)//1024} KB)")
     print("  品目:", ", ".join(f"{p['model']}×{p['_qty']}" for p in items))
-    # PDFは --pdf を明示したときだけ生成。未指定なら一切PDFを作らず、Chromium等の重い処理も走らせない。
     if a.pdf:
         pp=os.path.join(ROOT,"out",f"proposal_{a.ver}.pdf")
         render_pdf(hp,pp); print("PDF :",pp)
-    else:
-        print("  PDF : 未生成（既定はHTMLのみ。必要なら --pdf を付けて再実行）")
 
 if __name__=="__main__":
     main()
