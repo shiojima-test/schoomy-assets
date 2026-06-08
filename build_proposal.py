@@ -4,7 +4,7 @@
 build_proposal.py — SchooMy 写真入り提案書HTML自動生成
 
 使い方:
-  python build_proposal.py --tools S-BD-AA1,S-CN-A10,S-UT-AA1 --magazines S-MZ-A16 --ver v1.1 --pdf
+  python build_proposal.py --tools S-BD-AA1,S-CN-A10,S-UT-AA1 --magazines S-MZ-A16 --ver v1.2 --pdf
 
 入力: 型番 or 製品名リスト（--tools ツール / --magazines 教材）
       型番は完全一致を優先、見つからなければ catalog.json の name に部分一致で型番へ変換。
@@ -127,7 +127,7 @@ def build_html(tools, mags, ver, title, logo_uri=None):
         rows+=f"<tr><td class='m'>{html.escape(p['model'])}</td><td>{html.escape(p['name'])}</td><td class='r'>{yen(p['priceExTax'])}</td><td class='r'>{yen(p['priceIncTax'])}</td></tr>"
     logo_html=f'<img class="hlogo" src="{logo_uri}" alt="SchooMy">' if logo_uri else ''
     def header(sub):
-        return f"""<div class="hband"><div class="htitle">{html.escape(title)}</div><div class="hright">{logo_html}<div class="hco">株式会社スクーミー / SchooMy</div></div></div><div class="subbar">{html.escape(sub)}</div>"""
+        return f"""<div class="hband"><div class="htitle">{html.escape(title)}</div>{logo_html}</div><div class="subbar">{html.escape(sub)}</div>"""
     foot=f"""<div class="foot">© 株式会社スクーミー　fox.schoomy.com　|　{html.escape(ver)}</div>"""
     css=f"""
 {reg}
@@ -137,11 +137,9 @@ def build_html(tools, mags, ver, title, logo_uri=None):
 html,body{{font-family:'MPLUS1p','Meiryo',sans-serif;color:{INK};-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .page{{width:210mm;height:297mm;position:relative;overflow:hidden;page-break-after:always;background:#fff}}
 .page:last-child{{page-break-after:auto}}
-.hband{{background:{INK};color:#fff;height:22mm;display:flex;align-items:center;justify-content:space-between;padding:0 12mm}}
+.hband{{background:{INK};color:#fff;height:22mm;display:flex;align-items:center;justify-content:space-between;padding:5mm 14mm}}
 .htitle{{font-weight:700;font-size:20pt;letter-spacing:.04em}}
-.hright{{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:1.2mm;max-height:22mm}}
-.hlogo{{height:10mm;width:auto;max-width:60mm;display:block;object-fit:contain}}
-.hco{{font-size:9pt;opacity:.85}}
+.hlogo{{height:10mm;width:auto;max-width:50mm;display:block;object-fit:contain;margin-left:8mm}}
 .subbar{{background:{ORANGE};color:#fff;height:8mm;display:flex;align-items:center;padding:0 12mm;font-size:10.5pt;font-weight:700}}
 .body{{padding:10mm 12mm}}
 .lead{{font-size:11pt;line-height:1.9;margin-bottom:7mm}}
@@ -156,8 +154,12 @@ table.sum td.m{{color:{BLUE};font-weight:700;white-space:nowrap}}
 .total .inc{{font-size:16pt;font-weight:700;color:{ORANGE}}}
 .cards{{display:flex;flex-direction:column;gap:5mm;padding:8mm 12mm}}
 .card{{display:flex;gap:6mm;border:1px solid #e3e3e3;border-radius:3mm;padding:5mm;align-items:center}}
-.card .thumb{{width:46mm;height:35mm;flex:0 0 46mm;background:{CREAM};border-radius:2mm;display:flex;align-items:center;justify-content:center;overflow:hidden}}
-.card .thumb img{{max-width:100%;max-height:100%;object-fit:contain}}
+/* ツール写真：正方形枠に中央センタークロップ（cover） */
+.card .thumb{{width:40mm;height:40mm;flex:0 0 40mm;background:{CREAM};border-radius:2mm;overflow:hidden}}
+.card .thumb img{{width:100%;height:100%;object-fit:cover;object-position:center;display:block}}
+/* 教材表紙：元比率のまま全体表示（contain・歪ませない／切らない） */
+.card.mag .thumb{{width:40mm;height:52mm;flex:0 0 40mm;display:flex;align-items:center;justify-content:center}}
+.card.mag .thumb img{{width:100%;height:100%;object-fit:contain}}
 .card .info{{flex:1}}
 .badge{{display:inline-block;background:{BLUE};color:#fff;font-size:9pt;font-weight:700;padding:1mm 3mm;border-radius:2mm;margin-bottom:2mm}}
 .cname{{font-size:13pt;font-weight:700;margin-bottom:1.5mm}}
@@ -212,7 +214,7 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--tools",default="")
     ap.add_argument("--magazines",default="")
-    ap.add_argument("--ver",default="v1.1")
+    ap.add_argument("--ver",default="v1.2")
     ap.add_argument("--title",default="ご提案書")
     ap.add_argument("--catalog",default=os.path.join(ROOT,"catalog.json"))
     ap.add_argument("--imgdir",default="img")
