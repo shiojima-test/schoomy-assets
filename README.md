@@ -58,4 +58,8 @@ python build_proposal.py \
 現行カタログ（58点）は全点に写真登録済み。未登録の型番を含めた場合はブランド準拠のプレースホルダ画像になる。
 
 ## ブランド
-teal #3AABA8 / cream #F5E4C4 / orange #E88A0A / blue #2E8EC4。黒ヘッダーバンド（右上にSchooMyロゴ）＋オレンジサブバー＋カード＋フッター。絵文字なし。英語表記は "SchooMy"。フォントは M PLUS 1p（埋め込み）/ メイリオ（フォールバック）。
+navy #1F2A30 / teal #3AABA8 / cream #F5E4C4 / orange #E88A0A / blue #2E8EC4。
+「開発事業紹介」PDFに準拠：濃紺ヘッダー帯（白タイトル＋右上ロゴ＋直下のオレンジ細ライン）、濃紺フッター帯
+（オレンジ「お問い合わせ」ラベル＋担当/TEL/Email、最下部に「© SchooMy, Inc. 株式会社スクーミー」と「fox.schoomy.com」）。
+既定の問い合わせ先は髙坂さん（`DEFAULT_CONTACT` 定数、`--contact-person/--contact-tel/--contact-email` で上書き可）。
+絵文字なし。英語表記は "SchooMy"。フォントは M PLUS 1p（埋め込み）/ メイリオ（フォールバック）。

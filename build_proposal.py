@@ -5,7 +5,7 @@ build_proposal.py — SchooMy 写真入り提案書HTML自動生成（柔軟版�
 
 使い方:
   python build_proposal.py --tools オレンジボード2,加速度センサー,スイッチ,湿度センサー,OLED,延長ケーブル,書き込み機2 \
-      --magazines 冷蔵庫,通学路 --ver v1.5
+      --magazines 冷蔵庫,通学路 --ver v1.6
 
 設計方針:
 - 既定は self-contained HTML 1枚を出力（写真base64・フォント埋め込み・右上ロゴ）。出力はHTMLのみ。
@@ -25,7 +25,15 @@ build_proposal.py — SchooMy 写真入り提案書HTML自動生成（柔軟版�
 import argparse, base64, io, json, os, re, sys, html
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-TEAL="#3AABA8"; CREAM="#F5E4C4"; ORANGE="#E88A0A"; BLUE="#2E8EC4"; INK="#1a1a1a"
+# ブランド色。NAVY は「開発事業紹介」PDFのヘッダー/フッター帯から実測した濃いネイビー。
+TEAL="#3AABA8"; CREAM="#F5E4C4"; ORANGE="#E88A0A"; BLUE="#2E8EC4"; INK="#1a1a1a"; NAVY="#1F2A30"
+
+# 既定の問い合わせ先（PDFフッターと同一）。--contact-* で上書き可。
+DEFAULT_CONTACT = {
+    "person": "髙坂 幹男",
+    "tel":    "080-4729-5996",
+    "email":  "mikio.kousaka@schoomy.com",
+}
 
 # ---------- catalog / 名前解決 ----------
 def load_catalog(path):
@@ -180,9 +188,10 @@ def product_card(p):
 </div>"""
 
 # ---------- HTML 組み立て ----------
-def build_html(items, ver, title, logo_uri=None):
+def build_html(items, ver, title, logo_uri=None, contact=None):
     tools=[p for p in items if not is_magazine(p)]
     mags =[p for p in items if is_magazine(p)]
+    contact=contact or DEFAULT_CONTACT
 
     used=set(title)
     for p in items:
@@ -194,6 +203,12 @@ def build_html(items, ver, title, logo_uri=None):
             if d.get(k): used.update(str(d[k]))
     used.update("ご提案書株式会社スクーミーツール教材月刊みんなのダイブ価格構成合計税抜税込点内容のご案内"
                 "ピックアップ写真未登録項目数本書はに関するです年月日単価小計数量ご対象学年情報数学理科化学英語")
+    # ヘッダー/フッターの固定文言（M PLUS サブセットに確実に含める：問い合わせ・社名・ドメイン・記号・英数）
+    used.update("お問い合わせ営業担当TELEmail © SchooMy, Inc. 株式会社スクーミー fox.schoomy.com 開発事業紹介"
+                "@:/.-_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    used.update(str(contact.get("person","")))
+    used.update(str(contact.get("tel","")))
+    used.update(str(contact.get("email","")))
     reg=subset_font_face(os.path.join(ROOT,"fonts","MPLUS1p-Regular.ttf"),used,"MPLUS1p",400)
     bold=subset_font_face(os.path.join(ROOT,"fonts","MPLUS1p-Bold.ttf"),used,"MPLUS1p",700)
 
@@ -218,14 +233,23 @@ html{{background:#eef0f2}}
 body{{font-family:'MPLUS1p','Meiryo',sans-serif;color:{INK};background:#eef0f2;line-height:1.6;
   -webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .wrap{{max-width:980px;margin:0 auto;background:#fff;min-height:100vh}}
-/* ヘッダーは最上部に1回だけ（黒バンド＋右上ロゴ）。繰り返さない */
-.hband{{background:{INK};color:#fff;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 36px}}
-.htitle{{font-weight:700;font-size:26px;letter-spacing:.04em}}
-.hver{{font-size:15px;font-weight:700;opacity:.85;margin-left:10px}}
-.hlogo{{height:64px;width:auto;display:block;object-fit:contain;margin-left:16px}}
-.subbar{{background:{ORANGE};color:#fff;padding:11px 36px;font-size:15px;font-weight:700}}
-/* フッターは最下部に1回だけ */
-.foot{{background:#f2f2f2;color:#666;font-size:12px;padding:16px 36px;text-align:center;border-top:1px solid #e6e6e6}}
+/* ヘッダーは最上部に1回だけ。PDF「開発事業紹介」に準拠：濃紺の帯＋白タイトル＋右上ロゴ＋直下のオレンジ細ライン */
+.hband{{background:{NAVY};color:#fff;display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:16px 44px;border-bottom:4px solid {ORANGE}}}
+.htitle{{font-weight:700;font-size:25px;letter-spacing:.04em}}
+.hver{{font-size:14px;font-weight:700;opacity:.8;margin-left:10px}}
+.hlogo{{height:52px;width:auto;display:block;object-fit:contain;margin-left:24px}}
+/* バージョン等の細い案内バー（薄色・最上部に1回） */
+.subbar{{background:#fff;color:#7a8590;padding:8px 44px;font-size:13px;font-weight:700;border-bottom:1px solid #eee}}
+/* フッターは最下部に1回だけ（PDFに準拠：濃紺帯＋お問い合わせ＋著作権/ドメイン） */
+.foot{{background:{NAVY};color:#fff}}
+.foot-contact{{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 44px}}
+.foot-label{{background:{ORANGE};color:#fff;font-weight:700;font-size:13px;padding:5px 14px;border-radius:6px;white-space:nowrap}}
+.foot-cinfo{{font-size:13px;color:#e9ecef;line-height:1.7}}
+.foot-cinfo .o{{color:#F2A23A;font-weight:700}}
+.foot-copy{{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
+  padding:9px 44px;font-size:11.5px;color:#9aa4ad;border-top:1px solid rgba(255,255,255,.10)}}
+.foot-copy .dom{{color:#c2c9cf}}
 .doc{{padding:30px 36px 36px}}
 .lead{{font-size:15px;line-height:1.95;margin-bottom:22px}}
 table.sum{{width:100%;border-collapse:collapse;font-size:14px}}
@@ -262,9 +286,10 @@ table.sum td.m{{color:{BLUE};font-weight:700;white-space:nowrap}}
 .empty{{color:#999;font-size:14px;padding:10px 0}}
 /* レスポンシブ：狭い画面ではカードを縦積み */
 @media (max-width:620px){{
-  .hband{{padding:18px 20px;flex-wrap:wrap;gap:12px}}
-  .htitle{{font-size:22px}} .hlogo{{height:56px;margin-left:0}}
-  .subbar,.foot,.doc{{padding-left:20px;padding-right:20px}}
+  .hband{{padding:14px 20px;flex-wrap:wrap;gap:10px}}
+  .htitle{{font-size:20px}} .hlogo{{height:46px;margin-left:0}}
+  .subbar,.doc{{padding-left:20px;padding-right:20px}}
+  .foot-contact,.foot-copy{{padding-left:20px;padding-right:20px}}
   .card{{flex-direction:column;align-items:stretch}}
   .card .thumb{{width:100%;height:auto;aspect-ratio:1/1;flex:none}}
   .card.mag .thumb{{width:100%;height:auto;aspect-ratio:3/4;flex:none}}
@@ -294,6 +319,19 @@ table.sum td.m{{color:{BLUE};font-weight:700;white-space:nowrap}}
   <div class="cards">{cards}</div>
 </section>"""
 
+    person=html.escape(str(contact.get("person","")))
+    tel=html.escape(str(contact.get("tel","")))
+    email=html.escape(str(contact.get("email","")))
+    footer=f"""<footer class="foot">
+  <div class="foot-contact">
+    <span class="foot-label">お問い合わせ</span>
+    <span class="foot-cinfo">営業担当：{person}　<span class="o">TEL {tel}</span>　<span class="o">Email {email}</span></span>
+  </div>
+  <div class="foot-copy">
+    <span>© SchooMy, Inc. 株式会社スクーミー</span>
+    <span class="dom">fox.schoomy.com</span>
+  </div>
+</footer>"""
     return f"""<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)} {html.escape(ver)}</title><style>{css}</style></head><body>
@@ -303,7 +341,7 @@ table.sum td.m{{color:{BLUE};font-weight:700;white-space:nowrap}}
 <main class="doc">
 {sections}
 </main>
-<footer class="foot">© 株式会社スクーミー　fox.schoomy.com　|　{html.escape(ver)}</footer>
+{footer}
 </div>
 </body></html>"""
 
@@ -323,14 +361,19 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--tools",default="")
     ap.add_argument("--magazines",default="")
-    ap.add_argument("--ver",default="v1.5")
+    ap.add_argument("--ver",default="v1.6")
     ap.add_argument("--title",default="ご提案書")
     ap.add_argument("--catalog",default=os.path.join(ROOT,"catalog.json"))
     ap.add_argument("--imgdir",default="img")
     ap.add_argument("--logo",default=os.path.join(ROOT,"assets","logo.png"))
+    # 問い合わせ先（既定は髙坂さん。PDFフッターと同一）。必要時のみ上書き。
+    ap.add_argument("--contact-person",default=DEFAULT_CONTACT["person"])
+    ap.add_argument("--contact-tel",default=DEFAULT_CONTACT["tel"])
+    ap.add_argument("--contact-email",default=DEFAULT_CONTACT["email"])
     ap.add_argument("--pdf",action="store_true",help="PDFも出力（既定はHTMLのみ）")
     a=ap.parse_args()
     doc,cat=load_catalog(a.catalog)
+    contact={"person":a.contact_person,"tel":a.contact_tel,"email":a.contact_email}
 
     def pick(csv):
         out=[]
@@ -349,7 +392,7 @@ def main():
     if a.logo and not logo_uri:
         print(f"⚠ ロゴ画像が見つかりません（{a.logo}）。ロゴ無しで生成します。", file=sys.stderr)
 
-    html_str=build_html(items,a.ver,a.title,logo_uri)
+    html_str=build_html(items,a.ver,a.title,logo_uri,contact)
     os.makedirs(os.path.join(ROOT,"out"),exist_ok=True)
     hp=os.path.join(ROOT,"out",f"proposal_{a.ver}.html")
     open(hp,"w",encoding="utf-8").write(html_str)
