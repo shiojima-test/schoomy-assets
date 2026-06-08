@@ -11,10 +11,24 @@ harvest_images.py — catalog.json の photoFileId から全画像をDriveで取
    非公開の場合は rclone 等の認証取得に切り替えてください（その場合 fetch() を差し替え）。
 """
 import io, json, os, sys, requests
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SESSION = requests.Session()
+
+def to_rgb_on_white(im):
+    """Exif回転を反映し、透過は必ず白背景でフラット化してRGB化する。
+    （convert('RGB')だけだと透明部分のRGB=0がそのまま黒帯になるため、白で合成する）"""
+    im = ImageOps.exif_transpose(im)            # 回転情報を反映（黒余白の混入を防ぐ）
+    has_alpha = im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info)
+    if has_alpha:
+        rgba = im.convert("RGBA")
+        bg = Image.new("RGB", rgba.size, (255, 255, 255))   # 白でフラット化（黒にしない）
+        bg.paste(rgba, mask=rgba.split()[-1])
+        return bg
+    if im.mode != "RGB":
+        return im.convert("RGB")
+    return im
 
 def fetch(file_id):
     url = "https://drive.google.com/uc?export=download"
@@ -42,8 +56,7 @@ def main():
             if not is_image(data):
                 failed.append((model, "not-image(HTMLの可能性)")); continue
             im = Image.open(io.BytesIO(data))
-            if im.mode not in ("RGB", "L"):
-                im = im.convert("RGB")
+            im = to_rgb_on_white(im)            # 透過は白でフラット化＋Exif回転反映（黒帯対策）
             w, h = im.size
             longest = max(w, h)
             if longest > 1200:

@@ -5,7 +5,7 @@ build_proposal.py — SchooMy 写真入り提案書HTML自動生成（柔軟版�
 
 使い方:
   python build_proposal.py --tools オレンジボード2,加速度センサー,スイッチ,湿度センサー,OLED,延長ケーブル,書き込み機2 \
-      --magazines 冷蔵庫,通学路 --ver v1.4
+      --magazines 冷蔵庫,通学路 --ver v1.5
 
 設計方針:
 - 既定は self-contained HTML 1枚を出力（写真base64・フォント埋め込み・右上ロゴ）。出力はHTMLのみ。
@@ -323,7 +323,7 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--tools",default="")
     ap.add_argument("--magazines",default="")
-    ap.add_argument("--ver",default="v1.4")
+    ap.add_argument("--ver",default="v1.5")
     ap.add_argument("--title",default="ご提案書")
     ap.add_argument("--catalog",default=os.path.join(ROOT,"catalog.json"))
     ap.add_argument("--imgdir",default="img")

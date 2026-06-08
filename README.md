@@ -23,6 +23,8 @@ pip install requests pillow fonttools playwright pypdf
 python harvest_images.py        # img/ に全画像を取得（公開URL）
 ```
 ※ Driveが「リンクを知っている全員」公開である前提。非公開なら harvest_images.py の fetch() を rclone 等の認証に差し替える。
+※ 透過PNG（多くのセンサー写真は角丸の透明背景）は**必ず白でフラット化**して保存する（`convert('RGB')` だけだと
+　 透明部分のRGB=0がそのまま黒帯になるため）。Exif回転も反映。これらは `harvest_images.py` の `to_rgb_on_white()` で処理。
 
 ## 提案書を作る（既定はHTMLのみ）
 ```
