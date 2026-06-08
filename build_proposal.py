@@ -5,11 +5,14 @@ build_proposal.py — SchooMy 写真入り提案書HTML自動生成（柔軟版�
 
 使い方:
   python build_proposal.py --tools オレンジボード2,加速度センサー,スイッチ,湿度センサー,OLED,延長ケーブル,書き込み機2 \
-      --magazines 冷蔵庫,通学路 --ver v1.3
+      --magazines 冷蔵庫,通学路 --ver v1.4
 
 設計方針:
-- 既定は self-contained HTML 1枚を出力（写真base64・フォント埋め込み・右上ロゴ）。PDFは --pdf のときだけ。
-- ページ数は固定しない。@page A4 の印刷CSSは残すが、内容は切らずに自然にページが伸びる。
+- 既定は self-contained HTML 1枚を出力（写真base64・フォント埋め込み・右上ロゴ）。出力はHTMLのみ。
+- 出力は「1枚物の縦長Webページ」。A4・@page・改ページは使わず、固定高さも作らない。
+  ヘッダー（黒バンド＋右上ロゴ＋オレンジサブバー）は最上部に1回、フッターは最下部に1回だけ。
+  コンテンツは中央寄せ（max-width 980px）・背景white基調・レスポンシブで、内容に応じて連続して伸びる。
+  ※A4 PDFへの書き出しはデザイン確定後に別途対応する（render_pdf は将来用に温存。既定では呼ばない）。
 - 入力は型番でも製品名でも可。表記ゆれ・部分一致で catalog.json から型番に解決（柔軟な名前解決）。
   ダイブ号は号名・通称・キーワード（例「冷蔵庫」「通学路」「p5.js」）でも解決。
   一意に決まらない場合は候補を提示して安全に停止（誤った型番を確定しない）。
@@ -210,50 +213,61 @@ def build_html(items, ver, title, logo_uri=None):
 {reg}
 {bold}
 *{{margin:0;padding:0;box-sizing:border-box}}
-@page{{size:A4;margin:0}}            /* 印刷はA4・フルブリード。ページ数は固定せず内容に応じて自然に伸びる */
-html,body{{font-family:'MPLUS1p','Meiryo',sans-serif;color:{INK};-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}}
-/* ヘッダー（黒バンド・右上ロゴ）。内容は切らず自然にページが伸びる（overflow:hidden は使わない） */
-.hband{{background:{INK};color:#fff;min-height:22mm;display:flex;align-items:center;justify-content:space-between;padding:5mm 12mm}}
-.htitle{{font-weight:700;font-size:18pt;letter-spacing:.04em}}
-.hver{{font-size:11pt;font-weight:700;opacity:.85;margin-left:4mm}}
-.hlogo{{height:10mm;width:auto;max-width:50mm;display:block;object-fit:contain;margin-left:8mm}}
-.foot{{background:#f2f2f2;color:#666;font-size:8pt;padding:3mm 12mm;text-align:center;border-top:1px solid #e0e0e0}}
-.subbar{{background:{ORANGE};color:#fff;min-height:8mm;display:flex;align-items:center;padding:2mm 12mm;font-size:10.5pt;font-weight:700}}
-.doc{{padding:6mm 12mm 4mm}}
-.lead{{font-size:11pt;line-height:1.9;margin-bottom:6mm}}
-table.sum{{width:100%;border-collapse:collapse;font-size:10.5pt}}
-table.sum th{{background:{TEAL};color:#fff;padding:3mm;text-align:left}}
-table.sum td{{border-bottom:1px solid #ddd;padding:2.4mm 3mm}}
+/* 1枚物の縦長Webページ。@page/改ページ/固定高さは使わず、コンテンツが連続して伸びる */
+html{{background:#eef0f2}}
+body{{font-family:'MPLUS1p','Meiryo',sans-serif;color:{INK};background:#eef0f2;line-height:1.6;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.wrap{{max-width:980px;margin:0 auto;background:#fff;min-height:100vh}}
+/* ヘッダーは最上部に1回だけ（黒バンド＋右上ロゴ）。繰り返さない */
+.hband{{background:{INK};color:#fff;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 36px}}
+.htitle{{font-weight:700;font-size:26px;letter-spacing:.04em}}
+.hver{{font-size:15px;font-weight:700;opacity:.85;margin-left:10px}}
+.hlogo{{height:64px;width:auto;display:block;object-fit:contain;margin-left:16px}}
+.subbar{{background:{ORANGE};color:#fff;padding:11px 36px;font-size:15px;font-weight:700}}
+/* フッターは最下部に1回だけ */
+.foot{{background:#f2f2f2;color:#666;font-size:12px;padding:16px 36px;text-align:center;border-top:1px solid #e6e6e6}}
+.doc{{padding:30px 36px 36px}}
+.lead{{font-size:15px;line-height:1.95;margin-bottom:22px}}
+table.sum{{width:100%;border-collapse:collapse;font-size:14px}}
+table.sum th{{background:{TEAL};color:#fff;padding:11px;text-align:left}}
+table.sum td{{border-bottom:1px solid #eee;padding:10px 11px}}
 table.sum td.r,table.sum th.r{{text-align:right;white-space:nowrap}}
 table.sum td.m{{color:{BLUE};font-weight:700;white-space:nowrap}}
-.total{{margin-top:6mm;background:{CREAM};border-left:6px solid {ORANGE};padding:5mm 6mm;display:flex;justify-content:space-between;align-items:center;break-inside:avoid}}
-.total .lab{{font-weight:700}}
-.total .ex{{font-size:11pt;margin-right:8mm;color:#555}}
-.total .inc{{font-size:16pt;font-weight:700;color:{ORANGE}}}
-.secbar{{margin-top:8mm;background:{ORANGE};color:#fff;padding:2mm 5mm;font-size:10.5pt;font-weight:700;border-radius:2mm}}
-.secttl{{padding:5mm 0 2mm;font-size:12pt;font-weight:700;color:{TEAL}}}
-.cards{{display:block}}            /* ページ跨ぎで break-inside:avoid を効かせるため block フロー */
-.card{{display:flex;gap:6mm;border:1px solid #e3e3e3;border-radius:3mm;padding:5mm;margin-bottom:5mm;align-items:center;break-inside:avoid;page-break-inside:avoid}}
-/* ツール写真：正方形枠に中央センタークロップ（cover） */
-.card .thumb{{width:40mm;height:40mm;flex:0 0 40mm;background:{CREAM};border-radius:2mm;overflow:hidden}}
+.total{{margin-top:22px;background:{CREAM};border-left:6px solid {ORANGE};padding:18px 22px;border-radius:8px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}}
+.total .lab{{font-weight:700;font-size:15px}}
+.total .ex{{font-size:15px;margin-right:24px;color:#555}}
+.total .inc{{font-size:22px;font-weight:700;color:{ORANGE}}}
+.secbar{{margin-top:36px;background:{ORANGE};color:#fff;padding:10px 18px;font-size:15px;font-weight:700;border-radius:8px}}
+.secttl{{padding:18px 0 8px;font-size:17px;font-weight:700;color:{TEAL}}}
+.cards{{display:flex;flex-direction:column;gap:18px}}
+.card{{display:flex;gap:22px;align-items:center;background:#fff;border:1px solid #eee;border-radius:12px;padding:18px}}
+/* サムネ：黒フチ/枠/濃い影なし、背景white統一。ツールは正方形センタークロップ */
+.card .thumb{{width:150px;height:150px;flex:0 0 150px;background:#fff;border:none;box-shadow:none;border-radius:8px;overflow:hidden}}
 .card .thumb img{{width:100%;height:100%;object-fit:cover;object-position:center;display:block}}
 /* 教材表紙：元比率のまま全体表示（contain・歪ませない／切らない） */
-.card.mag .thumb{{width:40mm;height:52mm;flex:0 0 40mm;display:flex;align-items:center;justify-content:center}}
+.card.mag .thumb{{width:150px;height:196px;flex:0 0 150px;display:flex;align-items:center;justify-content:center}}
 .card.mag .thumb img{{width:100%;height:100%;object-fit:contain}}
-.card .info{{flex:1}}
-.badgerow{{display:flex;align-items:center;gap:3mm;margin-bottom:2mm}}
-.badge{{display:inline-block;background:{BLUE};color:#fff;font-size:9pt;font-weight:700;padding:1mm 3mm;border-radius:2mm}}
-.qty{{display:inline-block;background:{INK};color:#fff;font-size:9pt;font-weight:700;padding:1mm 3mm;border-radius:2mm}}
-.cname{{font-size:13pt;font-weight:700;margin-bottom:1.5mm}}
-.can{{font-size:10pt;line-height:1.7;color:#333;margin-bottom:2mm}}
-.meta{{font-size:9pt;color:#666;margin-bottom:2mm}}
-.price{{font-size:10.5pt}}
-.price span{{margin-right:6mm;color:#555}}
-.price .ex{{font-size:9.5pt}}
-.price b{{color:{ORANGE};font-size:12pt;margin-right:6mm}}
-.empty{{color:#999;font-size:10pt;padding:3mm 0}}
-@media screen{{
-  body{{max-width:210mm;margin:0 auto;box-shadow:0 0 0 1px #eee}}
+.card .info{{flex:1;min-width:0}}
+.badgerow{{display:flex;align-items:center;gap:10px;margin-bottom:8px}}
+.badge{{display:inline-block;background:{BLUE};color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}}
+.qty{{display:inline-block;background:{INK};color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px}}
+.cname{{font-size:18px;font-weight:700;margin-bottom:5px}}
+.can{{font-size:13.5px;line-height:1.7;color:#333;margin-bottom:7px}}
+.meta{{font-size:12px;color:#777;margin-bottom:7px}}
+.price{{font-size:14px}}
+.price span{{margin-right:18px;color:#555}}
+.price .ex{{font-size:12.5px}}
+.price b{{color:{ORANGE};font-size:16px;margin-right:18px}}
+.empty{{color:#999;font-size:14px;padding:10px 0}}
+/* レスポンシブ：狭い画面ではカードを縦積み */
+@media (max-width:620px){{
+  .hband{{padding:18px 20px;flex-wrap:wrap;gap:12px}}
+  .htitle{{font-size:22px}} .hlogo{{height:56px;margin-left:0}}
+  .subbar,.foot,.doc{{padding-left:20px;padding-right:20px}}
+  .card{{flex-direction:column;align-items:stretch}}
+  .card .thumb{{width:100%;height:auto;aspect-ratio:1/1;flex:none}}
+  .card.mag .thumb{{width:100%;height:auto;aspect-ratio:3/4;flex:none}}
 }}
 """
     sections=""
@@ -283,12 +297,14 @@ table.sum td.m{{color:{BLUE};font-weight:700;white-space:nowrap}}
     return f"""<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)} {html.escape(ver)}</title><style>{css}</style></head><body>
+<div class="wrap">
 <header class="hband"><div class="htitle">{html.escape(title)}<span class="hver">{html.escape(ver)}</span></div>{logo_html}</header>
 <div class="subbar">ご提案内容のご案内　{html.escape(ver)}</div>
 <main class="doc">
 {sections}
 </main>
 <footer class="foot">© 株式会社スクーミー　fox.schoomy.com　|　{html.escape(ver)}</footer>
+</div>
 </body></html>"""
 
 def render_pdf(html_path, pdf_path):
@@ -307,7 +323,7 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--tools",default="")
     ap.add_argument("--magazines",default="")
-    ap.add_argument("--ver",default="v1.3")
+    ap.add_argument("--ver",default="v1.4")
     ap.add_argument("--title",default="ご提案書")
     ap.add_argument("--catalog",default=os.path.join(ROOT,"catalog.json"))
     ap.add_argument("--imgdir",default="img")
