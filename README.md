@@ -45,7 +45,8 @@ python build_proposal.py \
 - **出力形態**: 1枚物の縦長Webページ（A4/改ページ非依存）。ヘッダーは最上部に1回・フッターは最下部に1回、max-width 980px 中央寄せ・レスポンシブ。
 - `--ver` … バージョン（ファイル名・`<title>`・画面ヘッダー/サブバー/フッターすべてに反映）
 - `--logo` … ロゴ画像パス（既定 `assets/logo.png`）。**ヘッダー右上にSchooMyロゴ**（px指定で大きめ）を base64 で埋め込み。無ければロゴ無しで生成。
-- `--pdf` … 将来用フラグ（PDF生成コードは温存。**当面はHTMLのみ運用**。A4 PDF書き出しはデザイン確定後に別途対応）。
+- **既定はHTMLのみ出力（PDFは作らない）。** `--pdf` を明示したときだけ PDF を生成し、未指定では Chromium 等の重い処理も走らせない。
+- `--pdf` … このフラグを付けたときだけ `out/proposal_<ver>.pdf` も生成（PDF生成コードは温存）。
 - 出力: `out/proposal_<ver>.html`（`--pdf` 指定時のみ `out/proposal_<ver>.pdf` も）
 - **画像が無ければ先に `python harvest_images.py` を実行**（未取得だとプレースホルダ画像になる）。
 

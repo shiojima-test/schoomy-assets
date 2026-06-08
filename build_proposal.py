@@ -5,14 +5,15 @@ build_proposal.py — SchooMy 写真入り提案書HTML自動生成（柔軟版�
 
 使い方:
   python build_proposal.py --tools オレンジボード2,加速度センサー,スイッチ,湿度センサー,OLED,延長ケーブル,書き込み機2 \
-      --magazines 冷蔵庫,通学路 --ver v1.6
+      --magazines 冷蔵庫,通学路 --ver v1.7
 
 設計方針:
-- 既定は self-contained HTML 1枚を出力（写真base64・フォント埋め込み・右上ロゴ）。出力はHTMLのみ。
+- 既定は self-contained HTML 1枚のみを出力（写真base64・フォント埋め込み・右上ロゴ）。**PDFは作らない**。
+  PDF生成は --pdf を明示したときだけ。未指定では Playwright/Chromium 等の重い処理も一切走らせない。
 - 出力は「1枚物の縦長Webページ」。A4・@page・改ページは使わず、固定高さも作らない。
-  ヘッダー（黒バンド＋右上ロゴ＋オレンジサブバー）は最上部に1回、フッターは最下部に1回だけ。
+  ヘッダー（濃紺バンド＋右上ロゴ＋直下オレンジ細ライン）は最上部に1回、フッター（濃紺・問い合わせ）は最下部に1回だけ。
   コンテンツは中央寄せ（max-width 980px）・背景white基調・レスポンシブで、内容に応じて連続して伸びる。
-  ※A4 PDFへの書き出しはデザイン確定後に別途対応する（render_pdf は将来用に温存。既定では呼ばない）。
+  ※A4 PDFへの書き出しはデザイン確定後に --pdf で対応（render_pdf は温存。既定では呼ばない）。
 - 入力は型番でも製品名でも可。表記ゆれ・部分一致で catalog.json から型番に解決（柔軟な名前解決）。
   ダイブ号は号名・通称・キーワード（例「冷蔵庫」「通学路」「p5.js」）でも解決。
   一意に決まらない場合は候補を提示して安全に停止（誤った型番を確定しない）。
@@ -361,7 +362,7 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--tools",default="")
     ap.add_argument("--magazines",default="")
-    ap.add_argument("--ver",default="v1.6")
+    ap.add_argument("--ver",default="v1.7")
     ap.add_argument("--title",default="ご提案書")
     ap.add_argument("--catalog",default=os.path.join(ROOT,"catalog.json"))
     ap.add_argument("--imgdir",default="img")
@@ -370,7 +371,8 @@ def main():
     ap.add_argument("--contact-person",default=DEFAULT_CONTACT["person"])
     ap.add_argument("--contact-tel",default=DEFAULT_CONTACT["tel"])
     ap.add_argument("--contact-email",default=DEFAULT_CONTACT["email"])
-    ap.add_argument("--pdf",action="store_true",help="PDFも出力（既定はHTMLのみ）")
+    ap.add_argument("--pdf",action="store_true",
+                    help="このフラグを付けたときだけPDFを生成。既定はHTMLのみ（Chromiumも起動しない）")
     a=ap.parse_args()
     doc,cat=load_catalog(a.catalog)
     contact={"person":a.contact_person,"tel":a.contact_tel,"email":a.contact_email}
@@ -398,9 +400,12 @@ def main():
     open(hp,"w",encoding="utf-8").write(html_str)
     print("HTML:",hp,f"({len(html_str)//1024} KB)")
     print("  品目:", ", ".join(f"{p['model']}×{p['_qty']}" for p in items))
+    # PDFは --pdf を明示したときだけ生成。未指定なら一切PDFを作らず、Chromium等の重い処理も走らせない。
     if a.pdf:
         pp=os.path.join(ROOT,"out",f"proposal_{a.ver}.pdf")
         render_pdf(hp,pp); print("PDF :",pp)
+    else:
+        print("  PDF : 未生成（既定はHTMLのみ。必要なら --pdf を付けて再実行）")
 
 if __name__=="__main__":
     main()
