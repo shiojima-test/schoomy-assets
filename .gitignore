@@ -1,0 +1,6 @@
+# 生成物（build_proposal.py の出力）。再生成可能なためコミットしない。
+out/
+
+# Python
+__pycache__/
+*.pyc

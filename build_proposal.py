@@ -4,11 +4,13 @@
 build_proposal.py — SchooMy 写真入り提案書HTML自動生成
 
 使い方:
-  python build_proposal.py --tools S-BD-AA1,S-CN-A10,S-UT-AA1 --magazines S-MZ-A16 --ver v1.0 --pdf
+  python build_proposal.py --tools S-BD-AA1,S-CN-A10,S-UT-AA1 --magazines S-MZ-A16 --ver v1.1 --pdf
 
-入力: 型番リスト（--tools ツール / --magazines 教材）
+入力: 型番 or 製品名リスト（--tools ツール / --magazines 教材）
+      型番は完全一致を優先、見つからなければ catalog.json の name に部分一致で型番へ変換。
 出力: out/proposal_<ver>.html （--pdf 指定で out/proposal_<ver>.pdf も）
 写真は img/<型番>.png を base64 でHTMLに直接埋め込み（単一ファイルで完結）。
+ロゴ assets/logo.png を base64 で各ページ右上に埋め込み（無ければロゴ無しで生成）。
 フォントは M PLUS 1p を使用文字だけサブセット化して woff2 を埋め込み。
 """
 import argparse, base64, io, json, os, sys, html
@@ -37,6 +39,31 @@ def img_data_uri(model, imgdir):
     else:
         data=placeholder_png(model)
     return "data:image/png;base64,"+base64.b64encode(data).decode()
+
+def logo_data_uri(path):
+    """assets/logo.png を base64 data URI で返す。無ければ None（ロゴ無しフォールバック）。"""
+    if path and os.path.exists(path):
+        try:
+            data=open(path,"rb").read()
+            return "data:image/png;base64,"+base64.b64encode(data).decode()
+        except Exception as e:
+            print(f"⚠ ロゴ読込に失敗（{path}）: {e} — ロゴ無しで生成します。", file=sys.stderr)
+    return None
+
+def resolve_model(token, cat):
+    """型番（完全一致）優先、無ければ製品名の部分一致で型番に変換。後方互換。"""
+    t=token.strip()
+    if t in cat:                                   # 型番 完全一致（従来仕様）
+        return t
+    low={m.lower():m for m in cat}
+    if t.lower() in low:                           # 型番 大文字小文字無視
+        return low[t.lower()]
+    hits=[m for m,p in cat.items() if t in (p.get("name") or "")]  # 製品名 部分一致
+    if len(hits)==1:
+        return hits[0]
+    if len(hits)>1:
+        sys.exit(f"製品名 '{t}' が複数の型番に一致します（型番で指定してください）: {hits}")
+    sys.exit(f"型番・製品名がカタログに見つかりません: {token}")
 
 def subset_font_face(ttf_path, used_chars, family, weight):
     """Subset TTF to used chars, return @font-face CSS with embedded woff2(or ttf)."""
@@ -83,7 +110,7 @@ def mag_card(p):
   </div>
 </div>"""
 
-def build_html(tools, mags, ver, title):
+def build_html(tools, mags, ver, title, logo_uri=None):
     used=set(title)
     for p in tools+mags:
         for k in ("model","name","can","jan"):
@@ -98,8 +125,9 @@ def build_html(tools, mags, ver, title):
     rows=""
     for p in tools+mags:
         rows+=f"<tr><td class='m'>{html.escape(p['model'])}</td><td>{html.escape(p['name'])}</td><td class='r'>{yen(p['priceExTax'])}</td><td class='r'>{yen(p['priceIncTax'])}</td></tr>"
+    logo_html=f'<img class="hlogo" src="{logo_uri}" alt="SchooMy">' if logo_uri else ''
     def header(sub):
-        return f"""<div class="hband"><div class="htitle">{html.escape(title)}</div><div class="hco">株式会社スクーミー / SchooMy</div></div><div class="subbar">{html.escape(sub)}</div>"""
+        return f"""<div class="hband"><div class="htitle">{html.escape(title)}</div><div class="hright">{logo_html}<div class="hco">株式会社スクーミー / SchooMy</div></div></div><div class="subbar">{html.escape(sub)}</div>"""
     foot=f"""<div class="foot">© 株式会社スクーミー　fox.schoomy.com　|　{html.escape(ver)}</div>"""
     css=f"""
 {reg}
@@ -111,6 +139,8 @@ html,body{{font-family:'MPLUS1p','Meiryo',sans-serif;color:{INK};-webkit-print-c
 .page:last-child{{page-break-after:auto}}
 .hband{{background:{INK};color:#fff;height:22mm;display:flex;align-items:center;justify-content:space-between;padding:0 12mm}}
 .htitle{{font-weight:700;font-size:20pt;letter-spacing:.04em}}
+.hright{{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:1.2mm;max-height:22mm}}
+.hlogo{{height:10mm;width:auto;max-width:60mm;display:block;object-fit:contain}}
 .hco{{font-size:9pt;opacity:.85}}
 .subbar{{background:{ORANGE};color:#fff;height:8mm;display:flex;align-items:center;padding:0 12mm;font-size:10.5pt;font-weight:700}}
 .body{{padding:10mm 12mm}}
@@ -182,21 +212,25 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--tools",default="")
     ap.add_argument("--magazines",default="")
-    ap.add_argument("--ver",default="v1.0")
+    ap.add_argument("--ver",default="v1.1")
     ap.add_argument("--title",default="ご提案書")
     ap.add_argument("--catalog",default=os.path.join(ROOT,"catalog.json"))
     ap.add_argument("--imgdir",default="img")
+    ap.add_argument("--logo",default=os.path.join(ROOT,"assets","logo.png"))
     ap.add_argument("--pdf",action="store_true")
     a=ap.parse_args()
     cat=load_catalog(a.catalog)
     def pick(csv):
         out=[]
-        for m in [x.strip() for x in csv.split(",") if x.strip()]:
-            if m not in cat: sys.exit(f"型番がカタログに存在しません: {m}")
+        for tok in [x.strip() for x in csv.split(",") if x.strip()]:
+            m=resolve_model(tok,cat)               # 型番 or 製品名(部分一致) → 型番
             p=dict(cat[m]); p["_img"]=img_data_uri(m,a.imgdir); out.append(p)
         return out
     tools=pick(a.tools); mags=pick(a.magazines)
-    html_str=build_html(tools,mags,a.ver,a.title)
+    logo_uri=logo_data_uri(a.logo)
+    if a.logo and not logo_uri:
+        print(f"⚠ ロゴ画像が見つかりません（{a.logo}）。ロゴ無しで生成します。", file=sys.stderr)
+    html_str=build_html(tools,mags,a.ver,a.title,logo_uri)
     os.makedirs(os.path.join(ROOT,"out"),exist_ok=True)
     hp=os.path.join(ROOT,"out",f"proposal_{a.ver}.html")
     open(hp,"w",encoding="utf-8").write(html_str)
