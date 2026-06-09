@@ -1,0 +1,16 @@
+name: MND Caption Import
+on:
+  push:
+    paths:
+      - 'mnd/captions.json'
+  workflow_dispatch:
+jobs:
+  call-gas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger GAS web app to import captions
+        run: |
+          echo "Calling GAS web app..."
+          RESP=$(curl -s -L --max-time 120 "${{ secrets.GAS_EXEC_URL }}")
+          echo "Response: $RESP"
+          echo "$RESP" | grep -q '"ok":true' && echo "Import OK" || (echo "Import failed"; exit 1)
