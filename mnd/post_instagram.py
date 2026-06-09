@@ -35,16 +35,23 @@ def main():
     if not TOKEN:
         print("ERROR: IG_ACCESS_TOKEN secret is not set."); return 1
     today = jst_today()
+    test_now = os.environ.get("TEST_NOW", "").strip().lower() == "true"
     changed = False
+    done_test = False
     for path in sorted(glob.glob("mnd/schedule_*.json")):
         m = json.load(open(path, encoding="utf-8"))
         ig_user_id = os.environ.get("IG_USER_ID", "").strip() or m.get("ig_user_id", "")
         for it in m["items"]:
             if it.get("status") != "pending":
                 continue
-            d = datetime.datetime.strptime(it["date"], "%Y/%m/%d").date()
-            if d != today:
-                continue
+            if test_now:
+                if done_test:
+                    continue
+                done_test = True   # post only the first pending item, then stop
+            else:
+                d = datetime.datetime.strptime(it["date"], "%Y/%m/%d").date()
+                if d != today:
+                    continue
             print(f"posting {it['date']} ...")
             pid, err = publish_one(ig_user_id, it["image_url"], it["caption"])
             if pid:
