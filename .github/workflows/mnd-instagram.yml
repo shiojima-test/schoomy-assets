@@ -2,7 +2,12 @@ name: MND Instagram Auto Post
 on:
   schedule:
     - cron: '0 0 * * *'   # 毎日 00:00 UTC = JST 09:00
-  workflow_dispatch: {}    # 手動テスト実行用
+  workflow_dispatch:
+    inputs:
+      test_now:
+        description: 'true にすると、日付に関係なく未投稿の先頭1件を即投稿（テスト用）'
+        required: false
+        default: 'false'
 permissions:
   contents: write
 jobs:
@@ -13,10 +18,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Post due items to Instagram
+      - name: Post to Instagram
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          TEST_NOW: ${{ github.event.inputs.test_now }}
         run: python mnd/post_instagram.py
       - name: Commit status updates
         run: |
