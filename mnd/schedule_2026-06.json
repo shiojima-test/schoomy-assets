@@ -35,9 +35,9 @@
       "time": "09:00",
       "image_url": "https://raw.githubusercontent.com/shiojima-test/schoomy-assets/main/mnd/img/2026-06/2026-06-16.jpg",
       "caption": "ぐちゃぐちゃに見える音の波は、実はキレイな波の足し算でできています。低い音・中の音・高い音を重ね合わせると複雑な波になり、これを逆に分解する道具がフーリエ変換（FFT）です。音楽アプリのノイズ除去や心音のチェックなど、身の回りでも使われています。音センサーで波を測って、中身を見てみてください！\n詳細はプロフィールリンクから。\n#スクーミー #SchooMy #みんなのダイブ #情報II #プログラミング教育 #高校生 #情報I #フーリエ変換 #音センサー #データサイエンス",
-      "status": "pending",
+      "status": "error",
       "post_id": "",
-      "error": ""
+      "error": "container: {\"error\": {\"message\": \"Only photo or video can be accepted as media type.\", \"type\": \"OAuthException\", \"code\": 9004, \"error_subcode\": 2207052, \"is_transient\": false, \"error_user_title\": \"Media download has failed. The media URI doesn't meet our requirements.\", \"error_user_msg\": \"The media could not b"
     },
     {
       "date": "2026/06/18",
