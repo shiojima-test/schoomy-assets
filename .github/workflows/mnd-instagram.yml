@@ -1,7 +1,10 @@
-name: MND Instagram Auto Post
+name: MND Instagram Auto Post (停止中)
+# 2026-07-09 停止。note連動の新システム shiojima-test/schoomy-note-queue の
+# .github/workflows/ig-post.yml に一本化した。二重投稿を防ぐため cron を無効化している。
+# 再開する場合は下の schedule のコメントを外す（新システムのcronを止めてから行うこと）。
 on:
-  schedule:
-    - cron: '0 0 * * *'   # 毎日 00:00 UTC = JST 09:00
+  # schedule:
+  #   - cron: '0 0 * * *'   # 毎日 00:00 UTC = JST 09:00
   workflow_dispatch:
     inputs:
       test_now:
