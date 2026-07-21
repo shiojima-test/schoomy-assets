@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "SchooMy 提案アセットカタログ（マスター）",
-    "version": "v1.3",
-    "updated": "2026-06-08",
+    "version": "v1.4",
+    "updated": "2026-07-21",
     "sourceSheet": "1u7gmxyvmV8j5AbgBKDk37v5LJXYNpAA6UsoF2nVMaZU",
     "diveSheet": "13yXVppzgcE0NyY0ATZ7JdiCaYtNzBJ4wMVH_1HBEopk",
     "diveFields": [
@@ -81,7 +81,19 @@
       "情報Ⅱ紹介ページ",
       "おすすめ"
     ],
-    "joinKey": "model"
+    "joinKey": "model",
+    "guideSheet": "1GNtC9TVw9NrYIDE4geTGlbUY-BGSP-RBEPo9TwD2RfM",
+    "guideFields": [
+      "displayName",
+      "subtitle",
+      "highlight1",
+      "highlight2",
+      "photoUrl",
+      "iconUrl",
+      "iconBgUrl",
+      "guideUrl"
+    ],
+    "guideNote": "コネクターガイドシート（gid=1482878802）由来。40コネクターに guide オブジェクトを付与（v1.4, 2026-07-21）"
   },
   "products": [
     {
@@ -138,7 +150,17 @@
       "legacyName": "タッチセンサー",
       "photoFileId": "18wRLyaZtLO4FSLO8KKJN0Z8CiDR0wrap",
       "image": "img/S-CN-A01.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "タッチセンサー",
+        "subtitle": "スマートフォンなどのタッチ画面の仕組み",
+        "highlight1": "センサーの銀の部分に指がふれることで0から1に数値が変化します",
+        "highlight2": "静電容量(せいでんようりょう)の変化を読み取っています",
+        "photoUrl": "https://drive.google.com/uc?id=18wRLyaZtLO4FSLO8KKJN0Z8CiDR0wrap",
+        "iconUrl": "https://drive.google.com/uc?id=1DiFzugPs3K33c_gCaf-y0fTH-HyHlZyM",
+        "iconBgUrl": "https://drive.google.com/uc?id=1Tc3qGsdBLeKNfHCHURdCrVFfvZ44quZi",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/touch-sensor"
+      }
     },
     {
       "model": "S-CN-A02",
@@ -152,7 +174,17 @@
       "legacyName": "スイッチ",
       "photoFileId": "1SGAb_IlxSTKDIPaL5RJOfoKN0tqUt7Fv",
       "image": "img/S-CN-A02.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "スイッチ",
+        "subtitle": "早押しボタンや横断歩道にあるボタンなどの「おしボタン」",
+        "highlight1": "おされると0から1に値が変化します",
+        "highlight2": "おされたことで、電気の通り道ができて、電気が流れたことを判定しています",
+        "photoUrl": "https://drive.google.com/uc?id=1SGAb_IlxSTKDIPaL5RJOfoKN0tqUt7Fv",
+        "iconUrl": "https://drive.google.com/uc?id=1-kve8y_V6zXP40SMp_T3GpptorTt3W17",
+        "iconBgUrl": "https://drive.google.com/uc?id=1jtBxQxUSR9LlC8JQyZbxeMfoaGOKhB0r",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/switch"
+      }
     },
     {
       "model": "S-CN-A03",
@@ -166,7 +198,17 @@
       "legacyName": "明るさセンサー",
       "photoFileId": "1uZ17R-NlGaIq7bG8zPDBOgNtSVzeT598",
       "image": "img/S-CN-A03.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "明るさセンサー",
+        "subtitle": "パソコンなどで、周りが暗いと画面が明るくなる仕組み",
+        "highlight1": "どのくらいセンサーに光が当たっているかを見ることができます",
+        "highlight2": "Cdsセルとよばれることもあります",
+        "photoUrl": "https://drive.google.com/uc?id=1uZ17R-NlGaIq7bG8zPDBOgNtSVzeT598",
+        "iconUrl": "https://drive.google.com/uc?id=12BDmX5jMTGHKEDjA15jH4PG7gIdVkrOB",
+        "iconBgUrl": "https://drive.google.com/uc?id=1jFF2HVw6zmVf7_UpUeXUke8l8PLVUXuz",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/light-sensor"
+      }
     },
     {
       "model": "S-CN-A04",
@@ -180,7 +222,17 @@
       "legacyName": "磁気センサー",
       "photoFileId": "1-VNl1n22rhm35S17SBxDYnBVpCTbLRq4",
       "image": "img/S-CN-A04.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "磁気センサー",
+        "subtitle": "エアコンや冷蔵庫などの家電製品で利用される仕組み",
+        "highlight1": "磁力に反応します。N極、S極で反応が変わります",
+        "highlight2": "ホール効果を利用しているので、ホールセンサーとも呼ばれます",
+        "photoUrl": "https://drive.google.com/uc?id=1-VNl1n22rhm35S17SBxDYnBVpCTbLRq4",
+        "iconUrl": "https://drive.google.com/uc?id=1deIotk-utl0T3h4fdDn-PpI2_iTVZv5v",
+        "iconBgUrl": "https://drive.google.com/uc?id=1bDTclmpFLa-m_8SMDd3RGUz9jloLBapW",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/magnet-sensor"
+      }
     },
     {
       "model": "S-CN-A05",
@@ -194,7 +246,17 @@
       "legacyName": "通過センサー",
       "photoFileId": "1Ok5TQ41FGoqQBtnm0rssMCIF7P-N_0ga",
       "image": "img/S-CN-A05.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "通過センサー",
+        "subtitle": "紙やコインなどのうすいものを通過して反応させる",
+        "highlight1": "うすいモノの通過を調べることができます",
+        "highlight2": "回転や開閉を検知することができます",
+        "photoUrl": "https://drive.google.com/uc?id=1Ok5TQ41FGoqQBtnm0rssMCIF7P-N_0ga",
+        "iconUrl": "https://drive.google.com/uc?id=1yJzEVgxCQlhuwGRoap90dsd31HFjcVbC",
+        "iconBgUrl": "https://drive.google.com/uc?id=1qVRnFRtTwKRd_XKatCX9B9MVC_F97N0C",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/pass-sensor"
+      }
     },
     {
       "model": "S-CN-A06",
@@ -208,7 +270,17 @@
       "legacyName": "音センサー",
       "photoFileId": "1w7aXNUz5vrdWRnX5GKbyLg5sQlI1F6yh",
       "image": "img/S-CN-A06.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "音センサー",
+        "subtitle": "スピーカーや音声入力できる仕組み",
+        "highlight1": "音の大きさ・小ささを読み取ることができます",
+        "highlight2": "音によって生成された音波がセンサーの中の部品にあたる必要があります",
+        "photoUrl": "https://drive.google.com/uc?id=1w7aXNUz5vrdWRnX5GKbyLg5sQlI1F6yh",
+        "iconUrl": "https://drive.google.com/uc?id=1pa7W0gGZk4AVlUu4dw4vRt50ilK_JWx-",
+        "iconBgUrl": "https://drive.google.com/uc?id=1X5_BGIvDa8oe_zBA4pwjVCKnCxK8FfI1",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/sound-sensor"
+      }
     },
     {
       "model": "S-CN-A07",
@@ -222,7 +294,17 @@
       "legacyName": "赤外線受信コネクター",
       "photoFileId": "16kHpNFG5SJDEriW1hNk5X23tWu9MFD4H",
       "image": "img/S-CN-A07.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "赤外線受信",
+        "subtitle": "リモコンなどから発せられる赤外線を読み取る",
+        "highlight1": "赤外線通信の受信を行います",
+        "highlight2": "テレビやエアコンのリモコンの赤外線の情報を読み取ることができます",
+        "photoUrl": "https://drive.google.com/uc?id=16kHpNFG5SJDEriW1hNk5X23tWu9MFD4H",
+        "iconUrl": "https://drive.google.com/uc?id=1m1isHO2827asL6Fb_9WVjz184wINFS8g",
+        "iconBgUrl": "https://drive.google.com/uc?id=1phNg5IS5STFg7BO9qASfBpqseBW7uweX",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/ir-recv-sensor"
+      }
     },
     {
       "model": "S-CN-A08",
@@ -236,7 +318,17 @@
       "legacyName": "土壌水分センサー",
       "photoFileId": "1gPUpgljl_HBBI-V7YKA-U0TwW04LPL7R",
       "image": "img/S-CN-A08.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "土壌水分センサー",
+        "subtitle": "土の水分量を調べて、その土壌に適した作物を育てる仕組み",
+        "highlight1": "土の中の水分量を測ることができます",
+        "highlight2": "水がない状態を0%、水しかない状態を100%としています",
+        "photoUrl": "https://drive.google.com/uc?id=1gPUpgljl_HBBI-V7YKA-U0TwW04LPL7R",
+        "iconUrl": "https://drive.google.com/uc?id=1FJlDxO4ujT_1RYVXaJnL2biCRmXjI4Nn",
+        "iconBgUrl": "https://drive.google.com/uc?id=1TLHjc1CK783jZjZvFPv5HuA2knC1evPi",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/soil-sensor"
+      }
     },
     {
       "model": "S-CN-A09",
@@ -250,7 +342,17 @@
       "legacyName": "温度センサーコネクター",
       "photoFileId": "1rfmF53UWVT34NB9fV14Rz-OwzOc1Ogfp",
       "image": "img/S-CN-A09.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "温度センサー",
+        "subtitle": "家電製品の温度が上がりすぎないようにするための仕組み",
+        "highlight1": "黒い部分が温度の変化を読み取ることができます",
+        "highlight2": "気温を測ったり、ふれたものの温度を測ることができます",
+        "photoUrl": "https://drive.google.com/uc?id=1rfmF53UWVT34NB9fV14Rz-OwzOc1Ogfp",
+        "iconUrl": "https://drive.google.com/uc?id=1uK9ZVP3H1rZaTJ22gt8121SxseQMO-Gw",
+        "iconBgUrl": "https://drive.google.com/uc?id=1aM_7p8JwV_yyGq2aLSMCl-b5dz_nC_v6",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/temp-sensor"
+      }
     },
     {
       "model": "S-CN-A10",
@@ -264,7 +366,17 @@
       "legacyName": "加速度センサーコネクター",
       "photoFileId": "1xm6PQlK8y3BHX2-qLuhL83gMcFrhzqY6",
       "image": "img/S-CN-A10.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "加速度・角度センサー",
+        "subtitle": "ボードがどれだけ動いたかを数値で示すことができる",
+        "highlight1": "ボードがどれだけ水平から傾いたかの角度がわかります",
+        "highlight2": "止まっているときを1とした時どれだけ動いたかわかります また加速度の大きさを測定できます",
+        "photoUrl": "https://drive.google.com/uc?id=1xm6PQlK8y3BHX2-qLuhL83gMcFrhzqY6",
+        "iconUrl": "https://drive.google.com/uc?id=1LWZSkpuRnwVkkk1SqP90NYPFd9bGwu4o",
+        "iconBgUrl": "https://drive.google.com/uc?id=1zsdokLX8RE3onsBZ3W2ubhCiuaNN5Oah",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/accel-sensor"
+      }
     },
     {
       "model": "S-CN-A11",
@@ -278,7 +390,17 @@
       "legacyName": "距離センサーコネクター",
       "photoFileId": "1kPndGViBM9vQJcy3cuEM8VmKP6XRT_Sh",
       "image": "img/S-CN-A11.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "距離センサー",
+        "subtitle": "自動運転の車の衝突(しょうとつ)を防ぐ仕組み",
+        "highlight1": "およそ2mくらいまでの距離を測ることができます",
+        "highlight2": "超音波センサーとよばれることもあります",
+        "photoUrl": "https://drive.google.com/uc?id=1kPndGViBM9vQJcy3cuEM8VmKP6XRT_Sh",
+        "iconUrl": "https://drive.google.com/uc?id=1cy_fa09NNYeKGuKUREyd10Yxmkwk7xFV",
+        "iconBgUrl": "https://drive.google.com/uc?id=1qckdt7Icps2Fs5nJ7wOqZjPiKE6A9pZm",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/distance-sensor"
+      }
     },
     {
       "model": "S-CN-A12",
@@ -292,7 +414,17 @@
       "legacyName": "LED",
       "photoFileId": "1yuMTgx1ICR9PHWVgd2pyKpjGP0TahL5S",
       "image": "img/S-CN-A12.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "LED",
+        "subtitle": "光ることで知らせたり、楽しませたりする",
+        "highlight1": "光ります",
+        "highlight2": "ずっと光ったり、ピカピカ光ったりします",
+        "photoUrl": "https://drive.google.com/uc?id=1yuMTgx1ICR9PHWVgd2pyKpjGP0TahL5S",
+        "iconUrl": "https://drive.google.com/uc?id=1d83izc2RJ5EC5QUnXADqCrnVxYJiBKYO",
+        "iconBgUrl": "https://drive.google.com/uc?id=1hrCWh5c-WBXcBtJ_N5Rl0L2OhYEe8Jrk",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/led"
+      }
     },
     {
       "model": "S-CN-A13",
@@ -306,7 +438,17 @@
       "legacyName": "7SEG",
       "photoFileId": "1CankGf3Ewsodq-DmB2IP2j2IV248h7Fb",
       "image": "img/S-CN-A13.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "7SEG",
+        "subtitle": "数字を表示する(9999まで)",
+        "highlight1": "センサーが取得する数字を表示することができます",
+        "highlight2": "時間や個数など、カウントアップやダウンができます",
+        "photoUrl": "https://drive.google.com/uc?id=1CankGf3Ewsodq-DmB2IP2j2IV248h7Fb",
+        "iconUrl": "https://drive.google.com/uc?id=1j39baiUbjTz_cIjcjJlURy9cpRU58m82",
+        "iconBgUrl": "https://drive.google.com/uc?id=168Wyb-qgZDUMDpmP786yRIjRwfFLoSG-",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/7seg"
+      }
     },
     {
       "model": "S-CN-A14",
@@ -320,7 +462,17 @@
       "legacyName": "フルカラーLED",
       "photoFileId": "1suI5n2BeD6iEkXutn0KjPm2HNBWCT5fb",
       "image": "img/S-CN-A14.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "フルカラーLED",
+        "subtitle": "RGBの値を設定し、色を変化させて光らせることができる",
+        "highlight1": "RGB(Red,Green,Blue)の値を変更で色を自由につくることができます",
+        "highlight2": "色が変化に変わる光らせ方ができ、その違いを使うことで工夫できます",
+        "photoUrl": "https://drive.google.com/uc?id=1suI5n2BeD6iEkXutn0KjPm2HNBWCT5fb",
+        "iconUrl": "https://drive.google.com/uc?id=1KTJdp3UHu0XITqLzlAB1XA86Gy1c8N6b",
+        "iconBgUrl": "https://drive.google.com/uc?id=1cFOptGF20zxuXoyj6ATiHHsfld_pqBoV",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/rgb-led"
+      }
     },
     {
       "model": "S-CN-A15",
@@ -334,7 +486,17 @@
       "legacyName": "赤外線送信",
       "photoFileId": "1Hs4wJ55Wkomk29TL7gyQWvak_6Bex6Y7",
       "image": "img/S-CN-A15.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "赤外線送信",
+        "subtitle": "同じ赤外線を設定することでテレビなどを操作できる",
+        "highlight1": "赤外線の送信を行います",
+        "highlight2": "リモコンと同じ赤外線を発する設定をプログラムすることでテレビなどを操作することができます",
+        "photoUrl": "https://drive.google.com/uc?id=1Hs4wJ55Wkomk29TL7gyQWvak_6Bex6Y7",
+        "iconUrl": "https://drive.google.com/uc?id=1-T8jTkoO5AWlNOJS-Z0JcizQ6BZUZ5yx",
+        "iconBgUrl": "https://drive.google.com/uc?id=1J_IIS6MGxBrM9tuqjABOH1pkXJcDS1e4",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/ir-send"
+      }
     },
     {
       "model": "S-CN-A16",
@@ -348,7 +510,17 @@
       "legacyName": "スピーカー",
       "photoFileId": "1u98o04mML2iInN9DG7vt0W1NZO_JR3aB",
       "image": "img/S-CN-A16.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "スピーカー",
+        "subtitle": "知らせる音・注意する音・楽しませる音などを出す",
+        "highlight1": "ドレミファ・・・でつくったメロディを出します",
+        "highlight2": "♯やオクターブ、長さの設定をしたメロディを出します",
+        "photoUrl": "https://drive.google.com/uc?id=1u98o04mML2iInN9DG7vt0W1NZO_JR3aB",
+        "iconUrl": "https://drive.google.com/uc?id=1AE0NrCAQSzClq8BhPT4mrbg7PvqEadcr",
+        "iconBgUrl": "https://drive.google.com/uc?id=1q4mKx4y9l9En9XvFUIN8pPHAozJhvHOu",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/speaker"
+      }
     },
     {
       "model": "S-CN-B01",
@@ -362,7 +534,17 @@
       "legacyName": "振動スイッチ",
       "photoFileId": "1n9kNJMpkDp02ejKw972sb0lKMrImhRXE",
       "image": "img/S-CN-B01.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "振動スイッチ",
+        "subtitle": "振動しているかどうかを判断する",
+        "highlight1": "振動スイッチでものが振動しているかしていないかを測ることができます",
+        "highlight2": "振動センサーに揺れが伝わると値が1になります",
+        "photoUrl": "https://drive.google.com/uc?id=1n9kNJMpkDp02ejKw972sb0lKMrImhRXE",
+        "iconUrl": "https://drive.google.com/uc?id=1SrVxWPas9NLJGxnIaKJDKFceULp_cD2Q",
+        "iconBgUrl": "https://drive.google.com/uc?id=1W5j8lXSdi9hnzhcr4kh2VjktiZ5XX1hv",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/vibration-switch"
+      }
     },
     {
       "model": "S-CN-B02",
@@ -376,7 +558,17 @@
       "legacyName": "USB",
       "photoFileId": "1PcYWSKXmXC7f7RWUyHmuLtgcjHLt3-gu",
       "image": "img/S-CN-B02.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "USBコネクター",
+        "subtitle": "スクーミーボードにUSB-Aを接続して制御する",
+        "highlight1": "USB-Aを接続して動かすことができる機器を制御できます",
+        "highlight2": "LED照明や小型扇風機の電源をつけたり、消したりできます",
+        "photoUrl": "https://drive.google.com/uc?id=1PcYWSKXmXC7f7RWUyHmuLtgcjHLt3-gu",
+        "iconUrl": "https://drive.google.com/uc?id=1FrWx2sxu6mkx7KdtOP39BFAHy-seOaR2",
+        "iconBgUrl": "https://drive.google.com/uc?id=1Qk1ZGoggSAjAmDS5AH8Jp7d4O5QUg-GD",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/usb"
+      }
     },
     {
       "model": "S-CN-B03",
@@ -390,7 +582,17 @@
       "legacyName": "雨センサー",
       "photoFileId": "1tZqzRTI92XQAZnLHIT9k3o41FCAcaQoi",
       "image": "img/S-CN-B03.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "雨センサー",
+        "subtitle": "雨が降ったことを判断する",
+        "highlight1": "電極間の導電性を利用して水滴を検知し、雨の降り具合を測ることができます",
+        "highlight2": "水滴がセンサープレートに付着すると電気抵抗が低下し、数値が大きくなります",
+        "photoUrl": "https://drive.google.com/uc?id=1tZqzRTI92XQAZnLHIT9k3o41FCAcaQoi",
+        "iconUrl": "https://drive.google.com/uc?id=1mG6vs_T6vwKxCfsI_UQw9moxCTvHd_MJ",
+        "iconBgUrl": "https://drive.google.com/uc?id=1X0VLW39Me6nwID_DWypg4JJwBkFkjT1v",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/rain-sensor"
+      }
     },
     {
       "model": "S-CN-B04",
@@ -404,7 +606,17 @@
       "legacyName": "湿度センサー",
       "photoFileId": "1hizWSubr4zYhk6FPqskwfY9QU9woZvdO",
       "image": "img/S-CN-B04.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "湿度センサー",
+        "subtitle": "空気中の湿度を測る",
+        "highlight1": "湿度(空気中に含まれる水蒸気の割合)を測ることができます",
+        "highlight2": "高湿度や低湿度のときにアラートを鳴らし、適切な湿度を保つセンサーをつくることができます",
+        "photoUrl": "https://drive.google.com/uc?id=1hizWSubr4zYhk6FPqskwfY9QU9woZvdO",
+        "iconUrl": "https://drive.google.com/uc?id=1HM5rh1av9iqfGTCc8tFJrLsIkyE5wnk1",
+        "iconBgUrl": "https://drive.google.com/uc?id=1UJlJ2vLR1LTQAwEHuYgp_u0rY8ZGW36S",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/moisture-sensor"
+      }
     },
     {
       "model": "S-CN-B05",
@@ -418,7 +630,17 @@
       "legacyName": "気圧センサー",
       "photoFileId": "11XqzGgZaNXgqThANUjoj_Nvi5RTFAU63",
       "image": "img/S-CN-B05.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "気圧センサー",
+        "subtitle": "周囲の気圧を測る",
+        "highlight1": "気圧(地球上の空気の重さによる圧力)の強さを測ることができます",
+        "highlight2": "上空に行くほど気圧が低くなることを利用して、高度を測ることもできます",
+        "photoUrl": "https://drive.google.com/uc?id=11XqzGgZaNXgqThANUjoj_Nvi5RTFAU63",
+        "iconUrl": "https://drive.google.com/uc?id=1hdPP2LYDRIGnlkVaPl4LmgaLiAR2YaVC",
+        "iconBgUrl": "https://drive.google.com/uc?id=1Vu1A3_iPJ9GbYDic6tYRPakTBsH2DCZX",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/barometric-pressure-sensor"
+      }
     },
     {
       "model": "S-CN-B06",
@@ -432,7 +654,17 @@
       "legacyName": "水温センサー",
       "photoFileId": "11HnvMIBFNP_3uKANXvqqbeUXDkwgwiD9",
       "image": "img/S-CN-B06.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "水温センサー",
+        "subtitle": "水の温度を測る",
+        "highlight1": "温度で抵抗値が変化する素子により水の温度を測ることができます",
+        "highlight2": "車のエンジン冷却水を監視して、オーバーヒートを防ぐときにも使われます",
+        "photoUrl": "https://drive.google.com/uc?id=11HnvMIBFNP_3uKANXvqqbeUXDkwgwiD9",
+        "iconUrl": "https://drive.google.com/uc?id=1liqakKXsA3l2Krsqqn4OBkVg1NRi9HnC",
+        "iconBgUrl": "https://drive.google.com/uc?id=1-70m6mutfQRQMDDYR_VBj_A2bPqAGNGZ",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/water-temperature-sensor"
+      }
     },
     {
       "model": "S-CN-B07",
@@ -446,7 +678,17 @@
       "legacyName": "人感センサー",
       "photoFileId": "1MtxOjtMDMoq7lmTSY4u6wECnfjvExIBW",
       "image": "img/S-CN-B07.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "人感センサー",
+        "subtitle": "周りに人がいるかどうかを判断する",
+        "highlight1": "人感センサーの周囲に動きがあるかどうかを測ることができます",
+        "highlight2": "人感センサーの近くで人が動くと1、じっとしていると0を示します",
+        "photoUrl": "https://drive.google.com/uc?id=1MtxOjtMDMoq7lmTSY4u6wECnfjvExIBW",
+        "iconUrl": "https://drive.google.com/uc?id=18GuDrJvUpEV0sZGLq9AOyJVhoKgjWKTu",
+        "iconBgUrl": "https://drive.google.com/uc?id=17MhvHv3dRli0h_WTMKHM8DcNKjQXh1WN",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/presence-sensor"
+      }
     },
     {
       "model": "S-CN-B08",
@@ -460,7 +702,17 @@
       "legacyName": "圧力センサー",
       "photoFileId": "1-vrLtBGhKDOXNALbf-NbL8wYlLcsrtAp",
       "image": "img/S-CN-B08.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "圧力センサー",
+        "subtitle": "センサーにかかる圧力を測る",
+        "highlight1": "センサーの表面に対して面積あたりに垂直に働く力の大きさを測ることができます",
+        "highlight2": "力が同じでも、面積が小さければ圧力は大きく、面積が大きければ圧力は小さくなります",
+        "photoUrl": "https://drive.google.com/uc?id=1-vrLtBGhKDOXNALbf-NbL8wYlLcsrtAp",
+        "iconUrl": "https://drive.google.com/uc?id=193bmiST8LuwvkyXAokktHMmE9p_Lp1W-",
+        "iconBgUrl": "https://drive.google.com/uc?id=1S7Ffy1Zw4POpnoiU6dN_Z0EinRZRP_9R",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/pressure-sensor"
+      }
     },
     {
       "model": "S-CN-B09",
@@ -474,7 +726,17 @@
       "legacyName": "アルコール",
       "photoFileId": "1_EaTBGx2KpNKIuMqUAWKgElNcGUtpR_e",
       "image": "img/S-CN-B09.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "アルコールセンサー",
+        "subtitle": "呼気中や血中のアルコール濃度を測る",
+        "highlight1": "アルコールセンサーでアルコールの呼気中濃度、血中濃度を測ることができます",
+        "highlight2": "息に含まれるアルコールの濃度によって音が変わるセンサーをつくることができます",
+        "photoUrl": "https://drive.google.com/uc?id=1_EaTBGx2KpNKIuMqUAWKgElNcGUtpR_e",
+        "iconUrl": "https://drive.google.com/uc?id=1Gm4XohkUyd6pWeyi_kqGao9ujZ9UNVSA",
+        "iconBgUrl": "https://drive.google.com/uc?id=1E_uGsvtGjTfh8J4jNj-s6A04h2slxmFk",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/alcohol-sensor"
+      }
     },
     {
       "model": "S-CN-B10",
@@ -488,7 +750,17 @@
       "legacyName": "曲げセンサー",
       "photoFileId": "1VLjZGPwQ4ha71XzXjsppMbes-EIzk2Of",
       "image": "img/S-CN-B10.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "曲げセンサー",
+        "subtitle": "センサーの曲がり具合を測る",
+        "highlight1": "曲げの角度や度合いに応じて変化する電気抵抗を検知して曲がり具合を測ることができます",
+        "highlight2": "大きく曲がれば曲がるほど導電素子の密度が高まり、数値が大きくなります",
+        "photoUrl": "https://drive.google.com/uc?id=1VLjZGPwQ4ha71XzXjsppMbes-EIzk2Of",
+        "iconUrl": "https://drive.google.com/uc?id=1nwajCdclcOkXzpZ8XQfqKf4SvkcZ3DM_",
+        "iconBgUrl": "https://drive.google.com/uc?id=1Ziy5psW4BHkIg-mJK3ZrCNBbYm3Av8jt",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/flex-sensor"
+      }
     },
     {
       "model": "S-CN-B11",
@@ -502,7 +774,17 @@
       "legacyName": "GPS",
       "photoFileId": "1UoDSEJ1Slto90x7Se9GFAg5Z3zl1PZdo",
       "image": "img/S-CN-B11.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "GPSセンサー",
+        "subtitle": "GPSセンサーのある位置の緯度と経度を測る",
+        "highlight1": "全地球測位システムにより緯度、経度、高度を測ることができます",
+        "highlight2": "複数のGPS衛星信号を受信することで高い精度で位置を調べることができます",
+        "photoUrl": "https://drive.google.com/uc?id=1UoDSEJ1Slto90x7Se9GFAg5Z3zl1PZdo",
+        "iconUrl": "https://drive.google.com/uc?id=14gDaZbyFnFuusr0Ud_Xk4v8YS2XYDOlq",
+        "iconBgUrl": "https://drive.google.com/uc?id=1PnmWoW0zr7o9kPZp3Z6f3YFV4z46kOFo",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/gps-sensor"
+      }
     },
     {
       "model": "S-CN-B12",
@@ -516,7 +798,17 @@
       "legacyName": "水流センサー",
       "photoFileId": "1g16SZgJEbtvEc4yhzk-nnnqY38ErgA6V",
       "image": "img/S-CN-B12.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "水流センサー",
+        "subtitle": "センサー内部の羽根車の回転数から水流の変化を計測できる",
+        "highlight1": "流れた水の量を羽根車の回転数として計測できます",
+        "highlight2": "羽根車の秒間回転数から水流の速さを数値として計測できます",
+        "photoUrl": "https://drive.google.com/uc?id=1g16SZgJEbtvEc4yhzk-nnnqY38ErgA6V",
+        "iconUrl": "https://drive.google.com/uc?id=1e7vzs9Z2Ry98w6z01Z-Bwz1INsoe9Atd",
+        "iconBgUrl": "https://drive.google.com/uc?id=1XBiC7RVHXjJ8xjnMgbw5dk4luDtegrFL",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/water-flow-sensor"
+      }
     },
     {
       "model": "S-CN-B13",
@@ -530,7 +822,17 @@
       "legacyName": "アンモニア",
       "photoFileId": "1zP8itPp-VQbUzxf1wvH0LjS01XTYyEpi",
       "image": "img/S-CN-B13.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "アンモニアセンサー",
+        "subtitle": "空気中のアンモニア濃度を測る",
+        "highlight1": "アンモニアセンサーで空気中のアンモニア濃度を測ることができます",
+        "highlight2": "空気中のアンモニア濃度によって色が変わるセンサーをつくることができます",
+        "photoUrl": "https://drive.google.com/uc?id=1zP8itPp-VQbUzxf1wvH0LjS01XTYyEpi",
+        "iconUrl": "https://drive.google.com/uc?id=10If0-4J116LJDjY7Q4iX5LVWVKxSQYbZ",
+        "iconBgUrl": "https://drive.google.com/uc?id=1FbyvQOVPRQTuHYMP2W6Z2S1vguxRM7Er",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/ammonia-sensor"
+      }
     },
     {
       "model": "S-CN-B14",
@@ -544,7 +846,17 @@
       "legacyName": "トグルスイッチ",
       "photoFileId": "1NF3zCPIhU9ilwC6UGjXMoUsGobs3IXlV",
       "image": "img/S-CN-B14.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "トグルスイッチ",
+        "subtitle": "トグルスイッチの「ON」「ON2」「OFF」の状態を判断する",
+        "highlight1": "トグルスイッチで「ON」と「OFF」を測ることができます",
+        "highlight2": "「ON」と「ON2」を切り替えることができます",
+        "photoUrl": "https://drive.google.com/uc?id=1NF3zCPIhU9ilwC6UGjXMoUsGobs3IXlV",
+        "iconUrl": "https://drive.google.com/uc?id=1LH2l1oL8mSwbKxVyHNjrj7fWa1gtpWMt",
+        "iconBgUrl": "https://drive.google.com/uc?id=1weGBjX_rfPhQ0ASTtFsWmVswVcEo6C4r",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/toggle-switch"
+      }
     },
     {
       "model": "S-CN-B15",
@@ -558,7 +870,17 @@
       "legacyName": "スライドスイッチ",
       "photoFileId": "1oyqA5RB6PvDDW0-ehZG5GGWQrmbex4zf",
       "image": "img/S-CN-B15.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "スライドスイッチ",
+        "subtitle": "スライドスイッチの「ON」「OFF」の状態を判断する",
+        "highlight1": "つまみを動かして「ON」と「OFF」を切り替えることができます",
+        "highlight2": "つまみを動かすことでが内部の接点を物理的に移動させて回路を開閉します",
+        "photoUrl": "https://drive.google.com/uc?id=1oyqA5RB6PvDDW0-ehZG5GGWQrmbex4zf",
+        "iconUrl": "https://drive.google.com/uc?id=1V12gPKNMwIVnckYmu8imL5EiLdlL8Pxx",
+        "iconBgUrl": "https://drive.google.com/uc?id=1k-GdrxmxBLtg5auvl3p1EFccspVkgbge",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/slide-switch"
+      }
     },
     {
       "model": "S-CN-B16",
@@ -572,7 +894,17 @@
       "legacyName": "フェーダー",
       "photoFileId": "1MP8IyLo_U4Zr_pZl9xPCeyn7fTr3X3BI",
       "image": "img/S-CN-B16.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "フェーダー",
+        "subtitle": "フェーダーの位置によって数字を出力する",
+        "highlight1": "最小値と最大値を指定することで、フェーダーの位置に応じてその範囲の値を指定することができます",
+        "highlight2": "つまみが下の方だと最小値、上の方だと最大値を出力できます",
+        "photoUrl": "https://drive.google.com/uc?id=1MP8IyLo_U4Zr_pZl9xPCeyn7fTr3X3BI",
+        "iconUrl": "https://drive.google.com/uc?id=1QdPC0-DwuS4wtIM25hPwBwgwpNRHz-T_",
+        "iconBgUrl": "https://drive.google.com/uc?id=1JIfwUsYEl7Qc6o8LTpYNND3eU8_2GCZg",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/fader"
+      }
     },
     {
       "model": "S-CN-B17",
@@ -586,7 +918,17 @@
       "legacyName": "振動モータ",
       "photoFileId": "1E9CwAcyDnBK7I-vjsY57n5ILlCnjAhtT",
       "image": "img/S-CN-B17.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "振動モーター",
+        "subtitle": "振動モーターを振動させる",
+        "highlight1": "振動モーターをずっと震わせることができます",
+        "highlight2": "交互に震えさせてリズムをとることができます",
+        "photoUrl": "https://drive.google.com/uc?id=1E9CwAcyDnBK7I-vjsY57n5ILlCnjAhtT",
+        "iconUrl": "https://drive.google.com/uc?id=15uBZE7FvbSAy6oMnh37CdL-0RoGEr4lY",
+        "iconBgUrl": "https://drive.google.com/uc?id=1OGUoxM6Jg8wy0oPchLeiBrnEherh9smh",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/vibration-motor"
+      }
     },
     {
       "model": "S-CN-B18",
@@ -600,7 +942,17 @@
       "legacyName": "プロペラ",
       "photoFileId": "19Lt3hs8dxL0wuwVv8ajEfduSWqXHPbsI",
       "image": "img/S-CN-B18.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "プロペラモーター",
+        "subtitle": "プロペラを回したり止めたりする",
+        "highlight1": "プロペラをずっと回し続けることができます",
+        "highlight2": "「止まる」ことでプロペラを止めることができます",
+        "photoUrl": "https://drive.google.com/uc?id=19Lt3hs8dxL0wuwVv8ajEfduSWqXHPbsI",
+        "iconUrl": "https://drive.google.com/uc?id=1XMwxqYuiOBZttGC266clxAzVSM3tjMne",
+        "iconBgUrl": "https://drive.google.com/uc?id=1TitcokxWGmuip0STSieZ7KynkhMHr9Dh",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/propeller-motor"
+      }
     },
     {
       "model": "S-CN-B19",
@@ -614,7 +966,17 @@
       "legacyName": "OLED",
       "photoFileId": "1hm1cXY-IThUdNkgPzd_1fPUZD6oXPFUv",
       "image": "img/S-CN-B19.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "OLED",
+        "subtitle": "OLEDに数値や文字を表示する",
+        "highlight1": "OLEDにセンサーの値を表示することができます",
+        "highlight2": "アルファベットも表示することができます",
+        "photoUrl": "https://drive.google.com/uc?id=1hm1cXY-IThUdNkgPzd_1fPUZD6oXPFUv",
+        "iconUrl": "https://drive.google.com/uc?id=18z7db5rHpNUgGQyPUx1k9e0ak1LSGqIC",
+        "iconBgUrl": "https://drive.google.com/uc?id=1LI7W8dqhUJ5i4j8ke3bkw4Scm0f-wRRR",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/oled"
+      }
     },
     {
       "model": "S-CN-B20",
@@ -628,7 +990,17 @@
       "legacyName": "180",
       "photoFileId": "11jXPmJ50501ES7M2MB9TpG2ZBmbzxyER",
       "image": "img/S-CN-B20.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "180°回転サーボモーター",
+        "subtitle": "180°サーボモーターの角度を制御する",
+        "highlight1": "サーボモーターの角度を0°\\~180°の間で決めて動かすことができます",
+        "highlight2": "ある位置で角度を決めて回転サーボモーターを止めることができます",
+        "photoUrl": "https://drive.google.com/uc?id=11jXPmJ50501ES7M2MB9TpG2ZBmbzxyER",
+        "iconUrl": "https://drive.google.com/uc?id=1S62XBHgcuBN3WKVjZBXctI-VzbSI6Tr6",
+        "iconBgUrl": "https://drive.google.com/uc?id=1qipTPf8Fg9A1tmqoNTOFL27C0DCa9yyG",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/servo-motor-180"
+      }
     },
     {
       "model": "S-CN-B21",
@@ -642,7 +1014,17 @@
       "legacyName": "ポンプ",
       "photoFileId": "1wloE8Ka1cQy9zSknJA1zJZLsIQ4le52h",
       "image": "img/S-CN-B21.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "ポンプ",
+        "subtitle": "ポンプを動かして水を出したり止めたりする",
+        "highlight1": "ポンプをずっと動かして水を出し続けることができます",
+        "highlight2": "センサーを使って水を供給できます",
+        "photoUrl": "https://drive.google.com/uc?id=1wloE8Ka1cQy9zSknJA1zJZLsIQ4le52h",
+        "iconUrl": "https://drive.google.com/uc?id=1CzrWl4s_1iX3fbN-P91lWt7W0qX31oDt",
+        "iconBgUrl": "https://drive.google.com/uc?id=1qAQMr1Emj_COliQD6ag7TWp1mxvvTcNW",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/pump"
+      }
     },
     {
       "model": "S-CN-B22",
@@ -656,7 +1038,17 @@
       "legacyName": "LEDバー",
       "photoFileId": "1Vxuj7KDKQ9B9cSq83gihnSt_ZESNo144",
       "image": "img/S-CN-B22.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "LEDバー",
+        "subtitle": "10メモリあるLEDバーの光らせる範囲を指定する",
+        "highlight1": "最小値と最大値を指定することでその範囲のLEDを光らせることができます",
+        "highlight2": "全て光らないを選択することで範囲に関係なく全て消すことができます",
+        "photoUrl": "https://drive.google.com/uc?id=1Vxuj7KDKQ9B9cSq83gihnSt_ZESNo144",
+        "iconUrl": "https://drive.google.com/uc?id=1zwXy9ALNzr4sZLa12Ksjl9b4rkc72Zqq",
+        "iconBgUrl": "https://drive.google.com/uc?id=1l3LbOEgDBL85shReCpjyreinpZkkDauC",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/led-bar"
+      }
     },
     {
       "model": "S-CN-B23",
@@ -670,7 +1062,17 @@
       "legacyName": "TTモーター",
       "photoFileId": "1mSCuV9ZSAaG__oWjTWWR7A4UNujOOhns",
       "image": "img/S-CN-B23.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "TTモーター",
+        "subtitle": "TTモーターを回したり止めたりする",
+        "highlight1": "TTモーターを回したり止めたりできます",
+        "highlight2": "回る方向を決めることができます",
+        "photoUrl": "https://drive.google.com/uc?id=1mSCuV9ZSAaG__oWjTWWR7A4UNujOOhns",
+        "iconUrl": "https://drive.google.com/uc?id=1hxA35Y08dNllUdNRmX0aDjanyzDaroHk",
+        "iconBgUrl": "https://drive.google.com/uc?id=1vrtvwhK74Dhqft-DN1udmsJa2HsJfo2v",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/tt-motor"
+      }
     },
     {
       "model": "S-CN-B24",
@@ -684,7 +1086,17 @@
       "legacyName": "SDカードコネクター",
       "photoFileId": "1HgVlzHPfqIgkl_oU2UriI6nlyiwh-pNI",
       "image": "img/S-CN-B24.png",
-      "note": null
+      "note": null,
+      "guide": {
+        "displayName": "SDカード",
+        "subtitle": "SDカードにセンサーの値などを書き込む",
+        "highlight1": "センサーから受け取った値をファイルに書き込むことができます",
+        "highlight2": "書き込んだファイルを消去できます",
+        "photoUrl": "https://drive.google.com/uc?id=1HgVlzHPfqIgkl_oU2UriI6nlyiwh-pNI",
+        "iconUrl": "https://drive.google.com/uc?id=16steEQLfF5LCqiu-i4-g3dgtJjJMGQhu",
+        "iconBgUrl": "https://drive.google.com/uc?id=1kYfDuyphHSM2f7II1p5Vdhw6JT-6r-hQ",
+        "guideUrl": "https://fox.schoomy.com/spot-live/connector-guide/sd-card"
+      }
     },
     {
       "model": "S-MZ-A02",
