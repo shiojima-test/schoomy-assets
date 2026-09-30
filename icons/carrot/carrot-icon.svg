@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#FFF4E6"/>
+  <circle cx="256" cy="290" r="210" fill="#FFE2BF"/>
+  <!-- antenna with leaf -->
+  <line x1="256" y1="118" x2="256" y2="72" stroke="#1A3A5C" stroke-width="12" stroke-linecap="round"/>
+  <path d="M256 74 C236 44 214 40 200 46 C214 64 234 74 256 74 Z" fill="#3AABA8"/>
+  <path d="M256 74 C276 40 300 34 314 40 C302 62 280 74 256 74 Z" fill="#2E8F8C"/>
+  <!-- ears -->
+  <path d="M112 212 L130 96 L214 150 Z" fill="#E8760C" stroke="#1A3A5C" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M400 212 L382 96 L298 150 Z" fill="#E8760C" stroke="#1A3A5C" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M142 176 L150 128 L190 152 Z" fill="#FFB36B"/>
+  <path d="M370 176 L362 128 L322 152 Z" fill="#FFB36B"/>
+  <!-- head -->
+  <rect x="96" y="124" width="320" height="270" rx="92" fill="#F39800" stroke="#1A3A5C" stroke-width="12"/>
+  <!-- side bolts -->
+  <rect x="70" y="232" width="34" height="64" rx="12" fill="#1A3A5C"/>
+  <rect x="408" y="232" width="34" height="64" rx="12" fill="#1A3A5C"/>
+  <!-- visor -->
+  <rect x="140" y="182" width="232" height="150" rx="58" fill="#1A3A5C"/>
+  <!-- eyes -->
+  <ellipse cx="204" cy="246" rx="24" ry="30" fill="#7FF0E8"/>
+  <ellipse cx="308" cy="246" rx="24" ry="30" fill="#7FF0E8"/>
+  <circle cx="212" cy="236" r="8" fill="#FFFFFF"/>
+  <circle cx="316" cy="236" r="8" fill="#FFFFFF"/>
+  <!-- nose & mouth -->
+  <path d="M246 286 L266 286 L256 297 Z" fill="#FFB36B"/>
+  <path d="M256 297 Q256 310 240 310 M256 297 Q256 310 272 310" fill="none" stroke="#FFB36B" stroke-width="6" stroke-linecap="round"/>
+  <!-- whiskers -->
+  <g stroke="#1A3A5C" stroke-width="8" stroke-linecap="round">
+    <line x1="100" y1="338" x2="40" y2="326"/><line x1="100" y1="360" x2="40" y2="368"/>
+    <line x1="412" y1="338" x2="472" y2="326"/><line x1="412" y1="360" x2="472" y2="368"/>
+  </g>
+  <!-- cheeks -->
+  <circle cx="160" cy="352" r="16" fill="#FFB36B"/>
+  <circle cx="352" cy="352" r="16" fill="#FFB36B"/>
+  <!-- body hint -->
+  <path d="M168 394 Q256 430 344 394 L360 512 L152 512 Z" fill="#F39800" stroke="#1A3A5C" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="256" cy="456" r="22" fill="#FFF4E6" stroke="#1A3A5C" stroke-width="8"/>
+  <circle cx="256" cy="456" r="8" fill="#3AABA8"/>
+</svg>
