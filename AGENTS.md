@@ -17,7 +17,7 @@
 - 書き込み機（オレンジボード専用・S-UT-AA1）：`icons/S-UT-AA1.svg`（= `icons/board_o_usb_flasher.svg`・黒い基板）
 - ブルーボード用の書き込み機：`icons/board_blue_usb_flasher.svg`（青い基板）
 - 書き込み機の縦向き：`icons/S-UT-AA1_vertical.svg`・`icons/board_blue_usb_flasher_vertical.svg`（元の横向きの rotate(-90) を外したもの）
-- SDカードコネクター：`icons/S-CN-B24.svg` は端の黒いピン（ソケット）が描かれていない。製品写真（img/S-CN-B24.png）に合わせて黒いソケットを足した `icons/S-CN-B24_header.svg` を使う（2026-10-28。正式版はデザインチームに依頼）
+- SDカードコネクター：`icons/S-CN-B24.svg`（デザインチームの元の絵。端の黒いソケットは描かれていない。勝手に描き足さない）
 - 資料・図版で製品を描くときは、写真（img/）より先にこのアイコンを使う（2026-10-28 塩島さん）
 
 ## 禁止事項
