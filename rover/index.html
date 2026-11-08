@@ -1,0 +1,1596 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ローバー シミュレーター</title>
+<style>
+:root {
+  --orange: #E88A0A; --teal: #3AABA8; --blue: #2E8EC4; --cream: #F5E4C4;
+  --dark: #1f2a30; --ink: #1f2a30; --sub: #5b6670; --line: #d9dde0;
+  --bg: #f4f2ee; --card: #ffffff; --ok: #1f9d55; --warn: #c0392b;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "Meiryo", "メイリオ", "Yu Gothic UI", "Hiragino Sans", sans-serif; font-size: 14px; }
+header { background: linear-gradient(90deg, #1f2a30, #2d3439); color: #fff; padding: 10px 18px; }
+header h1 { margin: 0; font-size: 19px; letter-spacing: .04em; }
+header p { margin: 2px 0 0; font-size: 12px; color: #c9d1d6; }
+.bar { display: flex; height: 5px; }
+.bar i { display: block; }
+main { display: grid; grid-template-columns: minmax(420px, 1fr) 400px; gap: 14px; padding: 14px; max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.card h2 { margin: 0 0 8px; font-size: 14px; color: var(--dark); border-left: 4px solid var(--orange); padding-left: 8px; }
+.mapwrap { position: relative; }
+canvas#map { width: 100%; aspect-ratio: 1 / 1; display: block; border-radius: 6px; background: #e9e6df; }
+.missions { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.missions button { flex: 1 1 0; min-width: 150px; text-align: left; padding: 6px 10px; }
+.missions button b { display: block; font-size: 14px; }
+.missions button span { display: block; font-size: 12px; opacity: .85; }
+.maphead { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 0 0 6px; }
+.maphead h3 { margin: 0; font-size: 16px; }
+.maphead small { color: var(--sub); font-size: 12px; }
+button { font: inherit; border: 1px solid #b9c0c5; background: #fff; border-radius: 6px; padding: 7px 10px; cursor: pointer; color: var(--ink); }
+button:hover { background: #f3f5f6; }
+button.primary { background: var(--orange); border-color: var(--orange); color: #fff; font-weight: bold; }
+button.primary:hover { background: #d37c06; }
+button.sel { background: var(--dark); border-color: var(--dark); color: #fff; }
+button:disabled { opacity: .45; cursor: default; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: 12px; color: var(--sub); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend b { display: inline-block; width: 13px; height: 13px; border-radius: 2px; border: 1px solid rgba(0,0,0,.15); }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.conn { font-size: 13px; color: var(--sub); }
+.conn.on { color: var(--ok); font-weight: bold; }
+table.st { width: 100%; border-collapse: collapse; }
+table.st th { text-align: left; font-weight: normal; color: var(--sub); width: 92px; padding: 5px 0; vertical-align: top; font-size: 13px; }
+table.st td { padding: 5px 0; font-size: 15px; font-weight: bold; }
+table.st tr + tr th, table.st tr + tr td { border-top: 1px solid #eef0f1; }
+.arrive { color: var(--ok); }
+.hit { color: var(--warn); font-size: 13px; }
+.chip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 4px; }
+textarea, input[type=text] { width: 100%; font: 13px/1.5 Consolas, "Meiryo", monospace; border: 1px solid #b9c0c5; border-radius: 6px; padding: 6px 8px; }
+textarea { height: 120px; resize: vertical; }
+label.chk { font-size: 12px; color: var(--sub); display: inline-flex; gap: 4px; align-items: center; }
+.log { height: 190px; overflow-y: auto; background: #1f2a30; color: #dfe6ea; border-radius: 6px; padding: 6px 8px; font: 12px/1.45 Consolas, "Meiryo", monospace; }
+.log div { white-space: pre-wrap; word-break: break-all; }
+.log .w { color: #ffc56b; }
+.log .n { color: #9fd3ff; }
+.log .s { color: #ff8f8f; }
+.log .i { color: #8fa1ab; }
+.note { font-size: 12px; color: var(--sub); margin: 6px 0 0; line-height: 1.6; }
+details summary { cursor: pointer; font-size: 13px; color: var(--sub); }
+.mapcard { align-self: start; }
+@media (min-width: 901px) { .mapcard { position: sticky; top: 10px; } }
+.toggles { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eef0f1; }
+.toggles label { font-size: 13px; display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
+.tunerow { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.tunerow .lab { width: 104px; font-size: 13px; color: var(--sub); }
+.tunerow input[type=number] { width: 84px; font: inherit; font-size: 15px; padding: 4px 6px; border: 1px solid #b9c0c5; border-radius: 6px; }
+.tunerow select { font: inherit; font-size: 15px; padding: 4px 6px; border: 1px solid #b9c0c5; border-radius: 6px; width: 92px; }
+.tunerow .no { width: 22px; text-align: right; color: var(--sub); font-size: 12px; }
+.tunerow .x { padding: 3px 9px; }
+.steps { margin: 8px 0 4px; padding-top: 8px; border-top: 1px solid #eef0f1; }
+.readout { margin-top: 8px; background: #f4f7f8; border-radius: 6px; padding: 8px 10px; font-size: 13px; line-height: 1.7; }
+.readout b { font-size: 14px; }
+.readout .good { color: var(--ok); font-weight: bold; }
+.readout .bad { color: var(--warn); font-weight: bold; }
+pre.blk { background: #f4f7f8; border-radius: 6px; padding: 8px 10px; font: 13px/1.5 Consolas, "Meiryo", monospace; max-height: 220px; overflow: auto; margin: 6px 0; }
+.card h2 .num { display: inline-block; background: var(--orange); color: #fff; border-radius: 50%; width: 20px; height: 20px; text-align: center; line-height: 20px; font-size: 12px; margin-right: 6px; }
+.presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+.presets button { padding: 6px 4px; font-size: 13px; line-height: 1.35; }
+.presets button small { display: block; font-size: 11px; color: var(--sub); }
+.presets button.sel small { color: #c9d1d6; }
+table.rec { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+table.rec th { text-align: left; font-weight: normal; color: var(--sub); border-bottom: 1px solid var(--line); padding: 4px 2px; }
+table.rec td { padding: 4px 2px; border-bottom: 1px solid #eef0f1; }
+.missions button.tune { flex: 1.25 1 0; }
+#cmpCard .tunerow .lab { width: 130px; }
+footer { text-align: center; font-size: 11px; color: var(--sub); padding: 4px 14px 16px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ローバー シミュレーター</h1>
+  <p>開智未来 中3 防災｜スクーミーのブロックで作ったプログラムで、画面の中のローバーを動かします</p>
+</header>
+<div class="bar"><i style="width:30.5%;background:#3AABA8"></i><i style="width:45.7%;background:#F5E4C4"></i><i style="width:8.4%;background:#E88A0A"></i><i style="width:15.5%;background:#2E8EC4"></i></div>
+
+<main>
+  <section class="card mapcard">
+    <div class="missions" id="missions"></div>
+    <div class="maphead"><h3 id="siteTitle"></h3><small>マット 1.2m四方（1マス 30cm）。向きの「北」はマットの4の側</small><button class="primary" id="btnHome" style="margin-left:auto">ローバーをスタートに戻す</button></div>
+    <div class="mapwrap"><canvas id="map" width="900" height="900"></canvas></div>
+    <div class="toggles">
+      <label><input type="checkbox" id="tgPreview" checked>予定の道すじ（①の数字）</label>
+      <label><input type="checkbox" id="tgDebris" checked>がれき・水を出す</label>
+      <label><input type="checkbox" id="tgFog" checked>まだ調べていないマスを灰色にする</label>
+    </div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="side">
+    <div class="card">
+      <h2><span class="num">1</span>パターンを選んで、数字を変えて試す</h2>
+      <div class="presets" id="presets"></div>
+      <div class="tunerow"><span class="lab">速さ speed</span><input type="number" id="tSpeed" min="0.1" step="0.5"><span>cm/秒</span></div>
+      <div class="tunerow"><span class="lab">回る速さ turn</span><input type="number" id="tTurn" min="0.1" step="1"><span>度/秒</span></div>
+      <div class="steps" id="tSteps"></div>
+      <div class="row"><button id="tAdd">＋命令を足す</button></div>
+      <div class="readout" id="tOut"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="primary" id="tRun">この数字で走らせる</button>
+        <button id="tStop">止める</button>
+      </div>
+      <p class="note">数字を変えると、地図の点線（予定の道すじ）がすぐに変わります。走らせるたびに跡の色が変わるので、前の数字と比べられます（前の走行が止まってから5秒あけて始まります）。</p>
+    </div>
+
+    <div class="card" id="cmpCard">
+      <h2>本物のローバーと比べる</h2>
+      <p class="note" style="margin-top:0">同じパターンを本物のローバーで走らせ、止まった所（ローバーの真ん中）と向きを測って入れます。地図をクリックしても位置を入れられます。</p>
+      <div class="tunerow"><span class="lab">東へ（左の端から）</span><input type="number" id="rX" step="0.5"><span>cm</span></div>
+      <div class="tunerow"><span class="lab">北へ（下の端から）</span><input type="number" id="rY" step="0.5"><span>cm</span></div>
+      <div class="tunerow"><span class="lab">向き</span><input type="number" id="rH" step="1"><span>度（0＝4の側）</span></div>
+      <div class="readout" id="cOut"></div>
+      <div class="row" style="margin-top:8px">
+        <button id="cRec">記録する</button>
+        <button id="cClear">測った所を消す</button>
+      </div>
+      <table class="rec" id="recTable"></table>
+    </div>
+
+    <div class="card">
+      <h2>ローバーのようす</h2>
+      <table class="st">
+        <tr><th>今の命令</th><td id="sCmd">---</td></tr>
+        <tr><th>位置</th><td id="sPos">---</td></tr>
+        <tr><th>マス</th><td id="sTile">---</td></tr>
+        <tr><th>向き</th><td id="sHead">---</td></tr>
+        <tr><th>走行</th><td id="sRun">---</td></tr>
+        <tr><th>ゴール</th><td id="sGoal">---</td></tr>
+        <tr><th>速さ</th><td id="sSpeed">---</td></tr>
+        <tr><th>地図</th><td id="sMap">---</td></tr>
+      </table>
+      <div class="row" style="margin-top:8px">
+        <button id="btnReset">スタートに戻す（跡を消す）</button>
+      </div>
+      <p class="note">止まってから5秒より長くあけて次の命令を出すと、新しい走行としてスタートに戻り、跡の色が変わります。</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">2</span>ブロックで作ってボードから流す</h2>
+      <p class="note" style="margin-top:0">①で決めた数字だと、ブロックのプログラムがシリアルにこの順で出せば同じ動きになります（数字は前の言葉の値。動きの言葉のあとは DELAY の秒数）。</p>
+      <pre class="blk" id="tLines"></pre>
+      <div class="row"><button id="tCopy">行をコピー</button></div>
+      <div style="height:10px"></div>
+      <div class="row">
+        <button class="primary" id="btnConnect">ボードにつなぐ</button>
+        <button id="btnDisconnect" disabled>切る</button>
+        <span class="conn" id="conn">つないでいません</span>
+      </div>
+      <p class="note" id="serialNote">本物のローバーの電源は切ってから、いつものブロックのプログラムを動かします。命令が届くと、画面のローバーが同じように動きます。</p>
+    </div>
+
+    <div class="card">
+      <h2>届いた行</h2>
+      <div class="log" id="log"></div>
+      <div class="row" style="margin-top:6px"><button id="btnClearLog">ログを消す</button></div>
+    </div>
+
+    <details class="card">
+      <summary>行を打って試す・テストの流れを再生する</summary>
+      <div style="height:8px"></div>
+      <input type="text" id="oneLine" placeholder="1行打って Enter（例：front　2　speed, 10）">
+      <div style="height:8px"></div>
+      <textarea id="multi"></textarea>
+      <div class="row" style="margin-top:6px">
+        <button id="btnRunText">上から流す</button>
+        <button id="btnTest">テストの流れを再生</button>
+        <button id="btnStopFlow">止める</button>
+      </div>
+      <div class="row" style="margin-top:4px">
+        <label class="chk"><input type="checkbox" id="autoWait" checked>動きの言葉のあとは、その数字（秒）だけ待って次の行へ</label>
+        <label class="chk"><input type="checkbox" id="testRepeat">テストをくり返す</label>
+      </div>
+      <p class="note">「wait 3」の行は3秒待ちます（ボードには送りません）。テストの流れは rovermap_test.py と同じです（前進3回・右回り・前進2回・停止）。</p>
+    </details>
+  </section>
+</main>
+<footer id="credit"></footer>
+
+<script>
+"use strict";
+const DATA = {"version": "1.4", "words": {"front": 70, "back": 21, "left": 67, "right": 68, "stop": 64, "speed": 101, "turn": 102, "wall": 103, "water": 104}, "delimiter": ",", "send_interval_ms": 0, "baud": 9600, "word_addr": "/Command", "num_addrs": ["/MoveX", "/MoveY", "/MoveZ"], "sites": [{"name": "ミッション1", "place": "校舎の南の広場", "goal": [60, 112], "goal_name": "校舎の入口（仮）", "buildings": [{"p": [[63.81, 118.03], [76.16, 117.63], [76.29, 121.45], [63.93, 121.85]], "school": false, "L2": 7.24, "h": 1.8}, {"p": [[-29.09, 214.87], [-29.12, 125.15], [24.96, 125.13], [24.99, 214.85]], "school": false, "L2": 7.18, "h": 2.7}, {"p": [[-29.94, 126.49], [-29.6, 226.47], [-94.7, 226.69], [-95.03, 126.71]], "school": false, "L2": 7.38, "h": 13.2}, {"p": [[-12.75, 128.14], [132.75, 128.14], [132.75, 231.86], [-12.75, 231.86]], "school": true, "L2": 7.14, "h": 23.2}, {"p": [[112.9, 176.6], [160.7, 176.17], [160.74, 180.73], [112.94, 181.16]], "school": false, "L2": 7.44, "h": 3.7}, {"p": [[171.76, 122.73], [166.98, 122.69], [167.01, 118.93], [171.79, 118.97]], "school": false, "L2": 7.36, "h": 1.2}, {"p": [[39.63, 118.43], [51.42, 118.06], [51.54, 122.04], [39.75, 122.41]], "school": false, "L2": 7.24, "h": 2.1}, {"p": [[34.81, 164.16], [34.71, 196.9], [25.27, 196.87], [25.37, 164.13]], "school": false, "L2": 7.34, "h": 7.9}, {"p": [[160.92, 128.93], [313.32, 127.6], [313.59, 158.54], [161.19, 159.87]], "school": false, "L2": 7.38, "h": 12.6}, {"p": [[157.95, 160.73], [271.86, 147.3], [274.89, 173.07], [160.98, 186.49]], "school": false, "L2": 7.38, "h": 2.4}, {"p": [[55.86, 117.46], [59.18, 117.35], [59.27, 120.09], [55.95, 120.2]], "school": false, "L2": 7.24, "h": 3.0}]}, {"name": "ミッション2", "place": "校舎と東の建物のあいだ", "goal": [105, 75], "goal_name": "通路の先の入口（仮）", "buildings": [{"p": [[185.42, 119.4], [31.04, 120.42], [30.84, 90.18], [185.22, 89.16]], "school": false, "L2": 7.49, "h": 11.9}, {"p": [[-64.19, 22.03], [-51.84, 21.63], [-51.71, 25.45], [-64.07, 25.85]], "school": false, "L2": 7.24, "h": 1.8}, {"p": [[-140.75, 32.14], [4.75, 32.14], [4.75, 135.86], [-140.75, 135.86]], "school": true, "L2": 7.14, "h": 23.2}, {"p": [[-39.92, 137.09], [-2.96, 137.33], [-2.99, 142.61], [-39.95, 142.37]], "school": false, "L2": 7.34, "h": 4.4}, {"p": [[-15.1, 80.6], [32.7, 80.17], [32.74, 84.73], [-15.06, 85.16]], "school": false, "L2": 7.44, "h": 3.7}, {"p": [[-52.31, 126.58], [-42.01, 126.58], [-42.01, 136.4], [-52.31, 136.4]], "school": false, "L2": 7.35, "h": 2.8}, {"p": [[43.76, 26.73], [38.98, 26.69], [39.01, 22.93], [43.79, 22.97]], "school": false, "L2": 7.36, "h": 1.2}, {"p": [[-13.25, 157.57], [8.39, 157.45], [8.44, 166.27], [-13.2, 166.39]], "school": false, "L2": 7.46, "h": 2.8}, {"p": [[32.92, 32.93], [185.32, 31.6], [185.59, 62.54], [33.19, 63.87]], "school": false, "L2": 7.38, "h": 12.6}, {"p": [[69.22, 121.98], [107.08, 121.73], [107.11, 126.25], [69.25, 126.5]], "school": false, "L2": 7.47, "h": 2.7}, {"p": [[30.23, 115.96], [1.97, 116.16], [1.91, 107.22], [30.17, 107.02]], "school": false, "L2": 7.14, "h": 7.7}, {"p": [[29.95, 64.73], [143.86, 51.3], [146.89, 77.07], [32.98, 90.49]], "school": false, "L2": 7.38, "h": 2.4}]}, {"name": "ミッション3", "place": "校舎の南西", "goal": [60, 72], "goal_name": "体育館の入口（仮）", "buildings": [{"p": [[98.91, 166.87], [98.88, 77.15], [152.96, 77.13], [152.99, 166.85]], "school": false, "L2": 7.18, "h": 2.7}, {"p": [[98.06, 78.49], [98.4, 178.47], [33.3, 178.69], [32.97, 78.71]], "school": false, "L2": 7.38, "h": 13.2}, {"p": [[115.25, 80.14], [260.75, 80.14], [260.75, 183.86], [115.25, 183.86]], "school": true, "L2": 7.14, "h": 23.2}, {"p": [[126.59, 176.64], [140.27, 176.53], [140.33, 183.75], [126.65, 183.86]], "school": false, "L2": 7.24, "h": 2.1}, {"p": [[-21.41, 133.68], [-12.69, 133.92], [-12.96, 143.56], [-21.68, 143.31]], "school": false, "L2": 7.6, "h": 3.2}, {"p": [[167.63, 70.43], [179.42, 70.06], [179.54, 74.04], [167.75, 74.41]], "school": false, "L2": 7.24, "h": 2.1}, {"p": [[162.81, 116.16], [162.71, 148.9], [153.27, 148.87], [153.37, 116.13]], "school": false, "L2": 7.34, "h": 7.9}, {"p": [[34.81, -46.24], [43.47, -46.15], [43.41, -40.15], [34.75, -40.24]], "school": false, "L2": 7.3, "h": 5.4}, {"p": [[19.0, 135.76], [19.88, 163.28], [-7.32, 164.15], [-8.2, 136.63]], "school": false, "L2": 7.18, "h": 5.7}]}], "depth_bins": [[6.0, "6m未満", "#cce6fa"], [7.0, "6〜7m", "#99c7f2"], [8.0, "7〜8m", "#619ee0"], [9.0, "8〜9m", "#336bbf"], [999.0, "9m以上", "#1a388c"]], "trail_colors": ["#ff8c00", "#009eff", "#1acc33", "#9e40d9"], "rover_mm": [120, 130], "water_cm": [12.0, 12.0], "rubble_cm": [6.4, 4.8], "test": {"lines": [{"at": 0.0, "text": "512.3", "label": "ループ 0 明るさ 512.3（動きには使わない）"}, {"at": 0.0, "text": "speed", "label": "ループ 0 speed → 101"}, {"at": 0.0, "text": "10", "label": "ループ 0 速さ 10cm/秒"}, {"at": 0.1, "text": "front", "label": "ループ 0 前進（front）→ 70"}, {"at": 0.1, "text": "2", "label": "ループ 0 DELAY 2（秒）"}, {"at": 2.1, "text": "120", "label": "ループ 1 明るさ 120（動きには使わない）"}, {"at": 2.1, "text": "speed", "label": "ループ 1 speed → 101"}, {"at": 2.1, "text": "10", "label": "ループ 1 速さ 10cm/秒"}, {"at": 2.2, "text": "water", "label": "ループ 1 水（water）→ 104"}, {"at": 2.2, "text": "0", "label": "ループ 1 数字 0（water のあと。読み捨て）"}, {"at": 2.2, "text": "front", "label": "ループ 1 前進（front）→ 70"}, {"at": 2.2, "text": "2", "label": "ループ 1 DELAY 2（秒）"}, {"at": 4.2, "text": "512.3", "label": "ループ 2 明るさ 512.3（動きには使わない）"}, {"at": 4.2, "text": "speed", "label": "ループ 2 speed → 101"}, {"at": 4.2, "text": "10", "label": "ループ 2 速さ 10cm/秒"}, {"at": 4.3, "text": "front", "label": "ループ 2 前進（front）→ 70"}, {"at": 4.3, "text": "2", "label": "ループ 2 DELAY 2（秒）"}, {"at": 6.3, "text": "512.3", "label": "ループ 3 明るさ 512.3（動きには使わない）"}, {"at": 6.3, "text": "speed", "label": "ループ 3 speed → 101"}, {"at": 6.3, "text": "10", "label": "ループ 3 速さ 10cm/秒"}, {"at": 6.4, "text": "wall", "label": "ループ 3 壁（がれき）（wall）→ 103"}, {"at": 6.4, "text": "0", "label": "ループ 3 数字 0（wall のあと。読み捨て）"}, {"at": 6.4, "text": "right", "label": "ループ 3 右回り（right）→ 68"}, {"at": 6.4, "text": "2", "label": "ループ 3 DELAY 2（秒）"}, {"at": 8.4, "text": "512.3", "label": "ループ 4 明るさ 512.3（動きには使わない）"}, {"at": 8.4, "text": "speed", "label": "ループ 4 speed → 101"}, {"at": 8.4, "text": "10", "label": "ループ 4 速さ 10cm/秒"}, {"at": 8.5, "text": "front", "label": "ループ 4 前進（front）→ 70"}, {"at": 8.5, "text": "2", "label": "ループ 4 DELAY 2（秒）"}, {"at": 10.5, "text": "512.3", "label": "ループ 5 明るさ 512.3（動きには使わない）"}, {"at": 10.5, "text": "speed", "label": "ループ 5 speed → 101"}, {"at": 10.5, "text": "10", "label": "ループ 5 速さ 10cm/秒"}, {"at": 10.6, "text": "front", "label": "ループ 5 前進（front）→ 70"}, {"at": 10.6, "text": "2", "label": "ループ 5 DELAY 2（秒）"}, {"at": 12.6, "text": "512.3", "label": "ループ 6 明るさ 512.3（動きには使わない）"}, {"at": 12.6, "text": "speed", "label": "ループ 6 speed → 101"}, {"at": 12.6, "text": "10", "label": "ループ 6 速さ 10cm/秒"}, {"at": 12.7, "text": "stop", "label": "ループ 6 停止（stop）→ 64"}, {"at": 12.7, "text": "0", "label": "ループ 6 DELAY 0（秒）"}], "pause_sec": 8.0, "loops": 7}, "credit": "出典：国土交通省 3D都市モデル（Project PLATEAU）加須市（2023年度）を加工して作成"};
+
+// ============================================================================
+// cluster の ItemScript（generate_rovermap.py が作るものをそのまま埋め込む）
+// $ ・ Vector3 ・ Quaternion だけをブラウザ用に差し替えて動かす
+// ============================================================================
+function ItemScript($, Vector3, Quaternion) {
+// ============================================================
+// XSchooMy ローバー地図 ItemScript v2.4
+//   generate_rovermap.py が生成する。数値を変えるときは generate_rovermap.py の先頭を直して再生成する。
+// 役割:
+//  1) 入室したプレイヤーに PlayerScript（RoverMapPlayer.js）を付ける（$.setPlayerScript）
+//  2) PlayerScript から "word"（言葉の番号）と "delay"（数字の行）を受ける
+//  3) マットの上の位置（cm）を時間で積み上げて、cluster のローバーを動かし、通った跡に点を置く
+//  4) 通ったマスの灰色の板を消し、wall でがれきの山、water で水を置く（走行をまたいで残る＝地図になる）
+// 動きの言葉: 70=前進 21=後退 67=左回り 68=右回り 64=停止
+//   命令は次の命令が来るまで続く。次が来なければ BP_LOOP_MS/1000 + delay（BP_DELAY_UNIT の単位）秒で止まる（本物と同じ）。
+//   その後 BP_MARGIN_SEC 秒以内に次の動きの命令が来たら、すき間も前の命令で動いたことにしてつなげる（シリアルの遅れ対策）。
+//   命令の BP_DELAY_WINDOW_SEC 秒以内に来た数字だけを delay とする（ほかの数字＝センサーは無視）。
+//   止まってから BP_RESET_SEC 秒より長くあいて命令が来たら、新しい走行（スタート位置から・次の色）。
+// 情報の言葉（100 以上。動きは変えない）: 101=speed 102=turn 103=wall 104=water
+//   101/102 のあと BP_DELAY_WINDOW_SEC 秒以内の数字 = 前進・後退の cm/秒 / 回る 度/秒（0 以下は無視）
+//   103/104 のあとの数字は読み捨てる（delay にもセンサーにもしない）
+// 座標: マットは南西の角が (0,0)cm、x=東、y=北。cluster の m ＝ (cm - MAT_CM/2) * SCALE / 100
+// ============================================================
+const CFG = {
+  "SCALE": 50,
+  "MAT_CM": 120,
+  "TILE_CM": 30,
+  "MAT_TILES": 4,
+  "ROVER_CM_PER_SEC": 10,
+  "ROVER_DEG_PER_SEC": 45,
+  "START_X_CM": 75,
+  "START_Y_CM": 15,
+  "START_HEADING_DEG": 0,
+  "TRAIL_STEP_CM": 2.4,
+  "TRAIL_POOL": 120,
+  "TRAIL_COLORS": 4,
+  "TRAIL_COLOR_NAMES": [
+    "オレンジ",
+    "青",
+    "緑",
+    "紫"
+  ],
+  "TRAIL_Y": 0.5,
+  "BP_LOOP_MS": 500,
+  "BP_MARGIN_SEC": 0.4,
+  "BP_DELAY_WINDOW_SEC": 0.3,
+  "BP_DELAY_SEC_PER_UNIT": 1.0,
+  "BP_RESET_SEC": 5,
+  "DRAW_SEC": 0.1,
+  "RUBBLE_AHEAD_CM": 6.0,
+  "RUBBLE_POOL": 40,
+  "WATER_POOL": 40,
+  "WATER_Y": 0.35,
+  "PLAYER_RADIUS_M": 3000,
+  "ROVER_POSE_SEC": 0.1,
+  "FOG_Y": 0.32,
+  "GRID_LABEL_Y": 2.5,
+  "GRID_LABEL_TILT": 40,
+  "GRID_LH": 0.2,
+  "DECK_EYE": [
+    0.0,
+    -100.0
+  ],
+  "SITE_DEFAULT": 0,
+  "SITES": [
+    {
+      "name": "ミッション1",
+      "place": "校舎の南の広場",
+      "cx": -0.0,
+      "cz": -0.0,
+      "yaw": 27.47,
+      "goal": [
+        60,
+        112
+      ],
+      "goal_name": "校舎の入口（仮）"
+    },
+    {
+      "name": "ミッション2",
+      "place": "校舎と東の建物のあいだ",
+      "cx": 78.926,
+      "cz": 13.066,
+      "yaw": 27.47,
+      "goal": [
+        105,
+        75
+      ],
+      "goal_name": "通路の先の入口（仮）"
+    },
+    {
+      "name": "ミッション3",
+      "place": "校舎の南西",
+      "cx": -45.713,
+      "cz": 50.816,
+      "yaw": 27.47,
+      "goal": [
+        60,
+        72
+      ],
+      "goal_name": "体育館の入口（仮）"
+    }
+  ],
+  "GOAL_R_CM": 8
+};
+
+const CODE_FRONT = 70, CODE_BACK = 21, CODE_LEFT = 67, CODE_RIGHT = 68, CODE_STOP = 64;
+const CODE_SPEED = 101, CODE_TURN = 102, CODE_WALL = 103, CODE_WATER = 104;
+const NAMES = { "70": "前進", "21": "後退", "67": "左回り", "68": "右回り", "64": "停止" };
+const INFO = { "101": "speed", "102": "turn", "103": "wall", "104": "water" };
+const COMPASS = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"];
+const NT = CFG.MAT_TILES * CFG.MAT_TILES;
+const attached = new Set();   // PlayerScript を付けたプレイヤー（付け直し＝状態リセットを防ぐ）
+const handles = [];           // そのプレイヤーのハンドル（ローバーの位置を送る。見る位置の切り替え用）
+let poseT = -999;
+let poll = 0;
+
+function cmToWorld(cm) { return (cm - CFG.MAT_CM / 2) * CFG.SCALE / 100; }
+
+// 今の現場（ミッション）。マットの (x, y)cm → 町の [x, z]（現場の中心と向きで回す）
+function site() { return CFG.SITES[($.state.site === undefined) ? CFG.SITE_DEFAULT : $.state.site]; }
+function toW(x, y) {
+  const st = site();
+  const lx = cmToWorld(x), lz = cmToWorld(y);
+  const r = st.yaw * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+  return [st.cx + lx * c + lz * s, st.cz - lx * s + lz * c];
+}
+
+function newBp() {
+  const next = [];
+  for (let c = 0; c < CFG.TRAIL_COLORS; c++) next.push(0);
+  return {
+    started: false, run: 0, code: CODE_STOP,
+    rcvT: 0, cmdT: 0, delay: 0, delayTaken: true,
+    t: 0, x: CFG.START_X_CM, y: CFG.START_Y_CM, h: CFG.START_HEADING_DEG,
+    carry: 0, next: next, q: []
+  };
+}
+
+// 地図（走行をまたいで残る）：調べたマス・がれき・水・今の速さ
+function newMap() {
+  const fog = [];
+  for (let i = 0; i < NT; i++) fog.push(false);
+  return {
+    seen: fog, seenN: 0, fogQ: [],
+    rubbleN: 0, waterN: 0, placeQ: [],
+    cms: CFG.ROVER_CM_PER_SEC, dps: CFG.ROVER_DEG_PER_SEC,
+    pend: -1, pendT: 0,     // 数字を待っている情報の言葉（-1 = なし）
+    arrived: false          // ゴール（入口）に着いたか
+  };
+}
+
+// 今の命令が終わる（止まる）時刻
+function holdEnd(b) {
+  if (!b.started) return -1e9;
+  if (b.code === CODE_STOP) return b.rcvT;
+  return b.rcvT + CFG.BP_LOOP_MS / 1000 + Math.max(0, b.delay) * CFG.BP_DELAY_SEC_PER_UNIT + CFG.BP_MARGIN_SEC;
+}
+
+function colorOf(b) { return ((b.run - 1) % CFG.TRAIL_COLORS + CFG.TRAIL_COLORS) % CFG.TRAIL_COLORS; }
+
+function normDeg(h) { return ((h % 360) + 540) % 360 - 180; }
+
+// (x, y)cm のマスを「調べた」にする（灰色の板を消すのは draw でまとめて）
+// ※ $.state から読んだものは写しなので、m・b は呼んだ側でまとめて $.state に書き戻す
+function reveal(m, x, y) {
+  if (x < 0 || y < 0 || x >= CFG.MAT_CM || y >= CFG.MAT_CM) return;
+  const c = Math.floor(x / CFG.TILE_CM), r = Math.floor(y / CFG.TILE_CM);
+  const i = r * CFG.MAT_TILES + c;
+  if (m.seen[i]) return;
+  m.seen[i] = true;
+  m.seenN += 1;
+  m.fogQ.push(i);
+}
+
+// 今の位置に点を1つ置く（描くのは draw でまとめて）
+function dropDot(b, m) {
+  const c = colorOf(b);
+  const i = b.next[c];
+  b.next[c] = (i + 1) % CFG.TRAIL_POOL;
+  const w = toW(b.x, b.y);
+  b.q.push([c, i, w[0], w[1]]);
+  reveal(m, b.x, b.y);
+}
+
+// 今の命令の本来の長さが終わる時刻（余裕 BP_MARGIN_SEC を含まない＝本物のローバーが止まる時刻）
+function moveEnd(b) {
+  if (!b.started) return -1e9;
+  if (b.code === CODE_STOP) return b.rcvT;
+  return b.rcvT + CFG.BP_LOOP_MS / 1000 + Math.max(0, b.delay) * CFG.BP_DELAY_SEC_PER_UNIT;
+}
+
+// b.t から now まで今の命令で動かす。ふだんは moveEnd で止める（最後の命令が余裕の分だけ進みすぎない）。
+// join=true（次の動きの命令が届いたとき）で、届いたのが holdEnd（余裕の内）なら、そこまでつなげて動かす（シリアルの遅れで途切れない）
+function advance(b, m, now, join) {
+  if (!b.started) return;
+  const lim = (join && now <= holdEnd(b)) ? now : moveEnd(b);
+  const until = Math.min(now, lim);
+  const sec = until - b.t;
+  if (sec > 0) {
+    const c = b.code;
+    if (c === CODE_FRONT || c === CODE_BACK) {
+      const sign = (c === CODE_FRONT) ? 1 : -1;
+      const r = b.h * Math.PI / 180;
+      const ux = Math.sin(r) * sign, uy = Math.cos(r) * sign;
+      let rest = sec * m.cms;
+      while (b.carry + rest >= CFG.TRAIL_STEP_CM) {
+        const s = CFG.TRAIL_STEP_CM - b.carry;
+        b.x += ux * s; b.y += uy * s;
+        rest -= s; b.carry = 0;
+        dropDot(b, m);
+      }
+      b.x += ux * rest; b.y += uy * rest;
+      b.carry += rest;
+      reveal(m, b.x, b.y);
+    } else if (c === CODE_LEFT) {
+      b.h = normDeg(b.h - sec * m.dps);
+    } else if (c === CODE_RIGHT) {
+      b.h = normDeg(b.h + sec * m.dps);
+    }
+  }
+  if (until > b.t) b.t = until;
+}
+
+// 情報の言葉（動きは変えない）
+function onInfo(code, now) {
+  const m = $.state.map || newMap();
+  const b = $.state.bp || newBp();
+  advance(b, m, now);         // ここまで今の速さで進めておく（置く場所を決める前）
+  b.delayTaken = true;        // このあとの数字は、前の動きの命令の delay ではない
+  m.pend = code;
+  m.pendT = now;
+  if (code === CODE_WALL) {
+    const r = b.h * Math.PI / 180;
+    const x = b.x + Math.sin(r) * CFG.RUBBLE_AHEAD_CM, y = b.y + Math.cos(r) * CFG.RUBBLE_AHEAD_CM;
+    const w = toW(x, y);
+    m.placeQ.push(["Rubble_" + (m.rubbleN % CFG.RUBBLE_POOL), w[0], 0, w[1], b.h + site().yaw]);
+    m.rubbleN += 1;
+    $.log("[rovermap] wall -> rubble " + m.rubbleN);
+  } else if (code === CODE_WATER) {
+    const w = toW(b.x, b.y);
+    m.placeQ.push(["Water_" + (m.waterN % CFG.WATER_POOL), w[0], CFG.WATER_Y, w[1], site().yaw]);
+    m.waterN += 1;
+    $.log("[rovermap] water " + m.waterN);
+  }
+  $.state.bp = b;
+  $.state.map = m;
+  $.state.drawT = -999;
+}
+
+function onWord(arg) {
+  const code = Math.round(Number(arg));
+  if (!isFinite(code)) return;
+  const now = $.state.t || 0;
+  if (INFO[String(code)] !== undefined) { onInfo(code, now); return; }
+  if (NAMES[String(code)] === undefined) { $.log("[rovermap] unknown word " + code); return; }
+  const m = $.state.map || newMap();
+  m.pend = -1;
+  const b = $.state.bp || newBp();
+  if (!b.started || (now - holdEnd(b)) > CFG.BP_RESET_SEC) {
+    // 新しい走行：スタート位置に戻して、次の色で跡をつける（前の走行の点・地図は残す）
+    b.started = true;
+    b.run += 1;
+    b.x = CFG.START_X_CM; b.y = CFG.START_Y_CM; b.h = CFG.START_HEADING_DEG;
+    b.carry = 0;
+    b.t = now;
+    dropDot(b, m);
+    $.log("[rovermap] run " + b.run + " start");
+  } else {
+    advance(b, m, now, true);   // ここまで前の命令で進めてから切り替える（余裕の内に届いたらつなげる）
+    b.t = now;
+  }
+  b.code = code;
+  b.rcvT = now;
+  b.cmdT = now;
+  b.delay = 0;
+  b.delayTaken = false;
+  $.state.bp = b;
+  $.state.map = m;
+  $.state.drawT = -999;   // すぐ描き直す
+}
+
+function onDelay(arg) {
+  const v = Number(arg);
+  if (!isFinite(v)) return;
+  const now = $.state.t || 0;
+  const m = $.state.map;
+  if (m && m.pend >= 0) {
+    // 情報の言葉のあとの数字（窓の中なら使う。どちらにしても読み捨てる）
+    const code = m.pend;
+    m.pend = -1;
+    if ((now - m.pendT) <= CFG.BP_DELAY_WINDOW_SEC && v > 0) {
+      const b = $.state.bp;
+      if (b) { advance(b, m, now); $.state.bp = b; }   // 前の速さでここまで進めてから切り替える
+      if (code === CODE_SPEED && v !== m.cms) { m.cms = v; $.log("[rovermap] speed " + v + " cm/s"); }
+      else if (code === CODE_TURN && v !== m.dps) { m.dps = v; $.log("[rovermap] turn " + v + " deg/s"); }
+    }
+    $.state.map = m;
+    return;
+  }
+  const b = $.state.bp;
+  if (!b || !b.started || b.delayTaken) return;
+  if ((now - b.rcvT) <= CFG.BP_DELAY_WINDOW_SEC) {
+    b.delay = v;
+    b.delayTaken = true;
+    $.state.bp = b;
+  }
+}
+
+function tileName(x, y) {
+  if (x < 0 || y < 0 || x >= CFG.MAT_CM || y >= CFG.MAT_CM) return "マットの外";
+  const col = Math.floor(x / CFG.TILE_CM), row = Math.floor(y / CFG.TILE_CM) + 1;
+  return "マス" + "ABCDEFGH".charAt(col) + row;
+}
+
+function compass(h) { return COMPASS[Math.round((((h % 360) + 360) % 360) / 45) % 8]; }
+
+function fmt(v) { return String(Math.round(v * 10) / 10); }
+
+function mapLine(m) {
+  return "調べたマス " + m.seenN + "/" + NT + "｜がれき " + m.rubbleN + "｜水 " + m.waterN +
+         "\n速さ " + fmt(m.cms) + "cm/秒・" + fmt(m.dps) + "度/秒";
+}
+
+function statusText(b, m, now) {
+  const head = site().name + "（" + site().place + "）\n" +
+    (m.arrived ? "★到着：" + site().goal_name : "ゴール：" + site().goal_name) + "\n";
+  if (!b.started) return head + "命令 ---\nブロックのプログラムを動かすと\nここにローバーのようすが出ます\n" + mapLine(m);
+  const end = moveEnd(b);
+  const moving = (b.code !== CODE_STOP) && (now < end);
+  const line1 = moving ? (NAMES[String(b.code)] + " " + (Math.min(now, end) - b.cmdT).toFixed(1) + "秒")
+                       : "止まって待っています";
+  const line2 = "マット上 (" + b.x.toFixed(1) + ", " + b.y.toFixed(1) + ")cm｜" + tileName(b.x, b.y) + "｜" + compass(b.h) + "向き";
+  const line3 = "走行" + b.run + "回目（線：" + CFG.TRAIL_COLOR_NAMES[colorOf(b)] + "）";
+  return head + line1 + "\n" + line2 + "\n" + line3 + "\n" + mapLine(m);
+}
+
+function yawQuat(deg) {
+  const r = deg * Math.PI / 180;
+  return new Quaternion(0, Math.sin(r / 2), 0, Math.cos(r / 2));
+}
+
+function placeRover(b) {
+  const rover = $.subNode("Rover");
+  if (!rover) return;
+  const w = toW(b.x, b.y);
+  rover.setPosition(new Vector3(w[0], 0, w[1]));
+  rover.setRotation(yawQuat(b.h + site().yaw));
+}
+
+// ローバーの位置（cluster の m）と向きを、PlayerScript に送る（展望台のパネルでカメラを切り替えるため）
+function sendPose(b, now) {
+  if ((now - poseT) < CFG.ROVER_POSE_SEC) return;
+  poseT = now;
+  const w = toW(b.x, b.y), st = site();
+  const pose = [w[0], w[1], b.h + st.yaw, st.cx, st.cz, st.yaw];
+  for (let i = handles.length - 1; i >= 0; i--) {
+    const p = handles[i];
+    try {
+      if (!p.exists()) { handles.splice(i, 1); attached.delete(p.id); continue; }
+      p.send("rover", pose);
+    } catch (e) {
+      // 送れなかった回は飛ばす（次の回にまた送る）
+    }
+  }
+}
+
+function draw(now) {
+  const b = $.state.bp || newBp();
+  const m = $.state.map || newMap();
+  advance(b, m, now);
+  const g = site().goal;
+  if (b.started && !m.arrived && Math.hypot(b.x - g[0], b.y - g[1]) <= CFG.GOAL_R_CM) {
+    m.arrived = true;
+    $.log("[rovermap] arrived " + site().goal_name);
+  }
+  const q = b.q;
+  b.q = [];
+  $.state.bp = b;
+  for (let k = 0; k < q.length; k++) {
+    const d = q[k];
+    const nd = $.subNode("Trail" + d[0] + "_" + d[1]);
+    if (nd) {
+      nd.setPosition(new Vector3(d[2], CFG.TRAIL_Y, d[3]));
+      nd.setEnabled(true);
+    }
+  }
+  const fq = m.fogQ, pq = m.placeQ;
+  m.fogQ = []; m.placeQ = [];
+  $.state.map = m;
+  for (let k = 0; k < fq.length; k++) {
+    const i = fq[k];
+    const nd = $.subNode("Fog_" + (i % CFG.MAT_TILES) + "_" + Math.floor(i / CFG.MAT_TILES));
+    if (nd) nd.setEnabled(false);
+  }
+  for (let k = 0; k < pq.length; k++) {
+    const p = pq[k];
+    const nd = $.subNode(p[0]);
+    if (nd) {
+      nd.setPosition(new Vector3(p[1], p[2], p[3]));
+      nd.setRotation(yawQuat(p[4]));
+      nd.setEnabled(true);
+    }
+  }
+  placeRover(b);
+  sendPose(b, now);
+  const text = statusText(b, m, now);
+  if (text !== $.state.shownText) {
+    const st = $.subNode("Status");
+    if (st) st.setText(text);
+    const sb = $.subNode("StatusBig");
+    if (sb) sb.setText(text);
+    $.state.shownText = text;
+  }
+}
+
+// 今の現場の灰色の板を並べる（マスの中心・現場の向き）
+function placeFog() {
+  const st = site();
+  for (let r = 0; r < CFG.MAT_TILES; r++) {
+    for (let c = 0; c < CFG.MAT_TILES; c++) {
+      const nd = $.subNode("Fog_" + c + "_" + r);
+      if (!nd) continue;
+      const w = toW((c + 0.5) * CFG.TILE_CM, (r + 0.5) * CFG.TILE_CM);
+      nd.setPosition(new Vector3(w[0], CFG.FOG_Y, w[1]));
+      nd.setRotation(yawQuat(st.yaw));
+      nd.setEnabled(true);
+    }
+  }
+}
+
+// Unity の Euler（X＝前に傾ける、Y＝向き、度）→ Quaternion（qy * qx）
+function eulerQuat(pitch, yaw) {
+  const a = yaw * Math.PI / 360, b = pitch * Math.PI / 360;
+  const sy = Math.sin(a), cy = Math.cos(a), sx = Math.sin(b), cx = Math.cos(b);
+  return new Quaternion(cy * sx, sy * cx, -sy * sx, cy * cx);
+}
+
+// 今の現場にマスの線と A〜D・1〜4 を動かす（文字は展望台の方を向ける）
+function placeGrid() {
+  const st = site();
+  for (let k = 0; k <= CFG.MAT_TILES; k++) {
+    let nd = $.subNode("GridNS" + k);
+    if (nd) {
+      const w = toW(k * CFG.TILE_CM, CFG.MAT_CM / 2);
+      nd.setPosition(new Vector3(w[0], CFG.GRID_LH / 2, w[1])); nd.setRotation(yawQuat(st.yaw));
+    }
+    nd = $.subNode("GridEW" + k);
+    if (nd) {
+      const w = toW(CFG.MAT_CM / 2, k * CFG.TILE_CM);
+      nd.setPosition(new Vector3(w[0], CFG.GRID_LH / 2, w[1])); nd.setRotation(yawQuat(st.yaw));
+    }
+  }
+  for (let i = 0; i < CFG.MAT_TILES; i++) {
+    const c = (i + 0.5) * CFG.TILE_CM;
+    const pts = [["ColLabel" + i, toW(c, -8)], ["RowLabel" + i, toW(-8, c)]];
+    for (const [name, w] of pts) {
+      const nd = $.subNode(name);
+      if (!nd) continue;
+      const face = Math.atan2(-(CFG.DECK_EYE[0] - w[0]), -(CFG.DECK_EYE[1] - w[1])) * 180 / Math.PI;
+      nd.setPosition(new Vector3(w[0], CFG.GRID_LABEL_Y, w[1]));
+      nd.setRotation(eulerQuat(CFG.GRID_LABEL_TILT, face));
+    }
+  }
+}
+
+// 現場を選び直す・始める：ローバー・跡・がれき・水・板を最初に戻す
+// ローバーだけスタートに戻す（跡・地図・走行の回数は残す。次の命令は新しい走行＝次の色）
+function goHome() {
+  const b = $.state.bp || newBp();
+  b.started = false;
+  b.code = CODE_STOP;
+  b.x = CFG.START_X_CM; b.y = CFG.START_Y_CM; b.h = CFG.START_HEADING_DEG;
+  b.carry = 0;
+  $.state.bp = b;
+  placeRover(b);
+  $.state.drawT = -999;
+  draw($.state.t || 0);
+}
+
+function resetAll(idx) {
+  $.state.site = idx;
+  $.state.drawT = -999;
+  $.state.shownText = "";
+  const b = newBp();
+  $.state.bp = b;
+  for (let c = 0; c < CFG.TRAIL_COLORS; c++) {
+    for (let i = 0; i < CFG.TRAIL_POOL; i++) {
+      const nd = $.subNode("Trail" + c + "_" + i);
+      if (nd) nd.setEnabled(false);
+    }
+  }
+  for (let i = 0; i < CFG.RUBBLE_POOL; i++) {
+    const nd = $.subNode("Rubble_" + i);
+    if (nd) nd.setEnabled(false);
+  }
+  for (let i = 0; i < CFG.WATER_POOL; i++) {
+    const nd = $.subNode("Water_" + i);
+    if (nd) nd.setEnabled(false);
+  }
+  placeFog();
+  const m = newMap();
+  reveal(m, CFG.START_X_CM, CFG.START_Y_CM);   // スタートのマスは最初から見えている
+  $.state.map = m;
+  placeRover(b);
+  draw($.state.t || 0);
+  $.log("[rovermap] site " + site().name);
+}
+
+$.onStart(() => {
+  $.log("[rovermap] item started v2.2");
+  $.state.t = 0;
+  resetAll(CFG.SITE_DEFAULT);
+});
+
+$.onReceive((messageType, arg, sender) => {
+  if (messageType === "word") { onWord(arg); return; }
+  if (messageType === "delay") { onDelay(arg); return; }
+  if (messageType === "site") {
+    const i = Math.round(Number(arg));
+    if (i >= 0 && i < CFG.SITES.length) resetAll(i);
+    return;
+  }
+}, { player: true });
+
+$.onUpdate((dt) => {
+  $.state.t = ($.state.t || 0) + dt;
+  const now = $.state.t;
+
+  // 入室したプレイヤーに PlayerScript を付ける（setPlayerScript は回数制限があるので1秒ごと・1人1回）
+  poll += dt;
+  if (poll >= 1.0) {
+    poll = 0;
+    const players = $.getPlayersNear(new Vector3(0, 0, 0), CFG.PLAYER_RADIUS_M);
+    for (const p of players) {
+      if (!attached.has(p.id)) {
+        attached.add(p.id);
+        handles.push(p);
+        $.setPlayerScript(p);
+        $.log("[rovermap] setPlayerScript -> " + p.id);
+      }
+    }
+  }
+
+  const last = ($.state.drawT === undefined) ? -999 : $.state.drawT;
+  if ((now - last) < CFG.DRAW_SEC) return;
+  $.state.drawT = now;
+  draw(now);
+});
+
+return { CFG, holdEnd, moveEnd, goHome, NAMES };
+}
+
+class Vector3 { constructor(x, y, z) { this.x = x; this.y = y; this.z = z; } }
+class Quaternion { constructor(x, y, z, w) { this.x = x; this.y = y; this.z = z; this.w = w; } }
+
+// cluster の $.state と同じく、読み書きのたびに写しを作る
+function makeRuntime(log) {
+  const store = {};
+  const clone = (v) => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
+  const state = new Proxy({}, {
+    get: (_, k) => clone(store[k]),
+    set: (_, k, v) => { store[k] = clone(v); return true; }
+  });
+  const nodes = {};
+  function subNode(name) {
+    if (!nodes[name]) {
+      nodes[name] = {
+        pos: null, enabled: null, text: null,
+        setPosition(v) { this.pos = { x: v.x, y: v.y, z: v.z }; },
+        setRotation(q) { this.rot = q; },
+        setEnabled(e) { this.enabled = !!e; },
+        setText(t) { this.text = t; }
+      };
+    }
+    return nodes[name];
+  }
+  const h = {};
+  const $ = {
+    state, subNode, log,
+    onStart: (f) => { h.start = f; },
+    onReceive: (f) => { h.recv = f; },
+    onUpdate: (f) => { h.update = f; },
+    getPlayersNear: () => [],
+    setPlayerScript: () => {}
+  };
+  const api = ItemScript($, Vector3, Quaternion);
+  return { store, nodes, h, api };
+}
+
+// ============================================================================
+// シミュレーター本体（時計・命令の受け渡し）
+// ============================================================================
+const SIM = {
+  manual: false,     // true のとき時計を進めるのは step() だけ（確かめ用）
+  manualT: 0,
+  t0: performance.now(),
+  rt: null,
+  queue: [],         // { at: 時計の秒, text }
+  testRepeat: false,
+  lastTestEnd: 0
+};
+function clock() { return SIM.manual ? SIM.manualT : (performance.now() - SIM.t0) / 1000; }
+
+function sysLog(s) { if (/unknown word/.test(s)) addLog(s, "i"); }
+
+function boot() {
+  SIM.rt = makeRuntime(sysLog);
+  SIM.rt.h.start();             // $.state.t = 0 → resetAll
+  SIM.rt.store.t = clock();     // 時計に合わせる（onStart は 0 から数える）
+  SIM.R = makeRouter(SIM.rt);
+}
+
+// 時計を target まで進める（onUpdate と同じ。dt は実際にたった秒）
+function updateTo(target, rt) {
+  rt = rt || SIM.rt;
+  const t = rt.store.t || 0;
+  if (target > t) rt.h.update(target - t);
+}
+
+// PlayerScript と同じ：/Command → "word"、/MoveX → "delay"、ほかは渡さない
+function osc(R, addr, v) {
+  if (addr === DATA.word_addr) R.rt.h.recv("word", v, null);
+  else if (addr === DATA.num_addrs[0]) R.rt.h.recv("delay", v, null);
+}
+
+// ---- bridge/main.py の LineRouter と同じ読み方 ----
+function makeRouter(rt) { return { rt, lastSendT: -1e9, afterWord: false }; }
+function parseNums(raw) {
+  const parts = raw.split(DATA.delimiter);
+  const out = [];
+  for (const p of parts) {
+    const s = p.trim();
+    if (s === "") return null;
+    if (!/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s) && !/^[+-]?(inf|infinity|nan)$/i.test(s)) return null;
+    const v = Number(/^[+-]?(inf|infinity)$/i.test(s) ? (s[0] === "-" ? -Infinity : Infinity) : (/nan/i.test(s) ? NaN : s));
+    out.push(v);
+  }
+  return out.length ? out : null;
+}
+function sendValues(R, values) {
+  values.forEach((v, i) => {
+    const addr = i < DATA.num_addrs.length ? DATA.num_addrs[i] : "/value" + i;
+    osc(R, addr, v);
+  });
+}
+// 1行（前後の空白は除いたもの）を読む。ログの文字と種類を返す
+function routeLine(R, text, now) {
+  if (text === "") return null;
+  const words = DATA.words;
+  const values = parseNums(text);
+  if (values === null) {
+    let key = text.toLowerCase(), nums = null;
+    if (!(key in words)) {
+      const parts = text.split(DATA.delimiter);
+      if (parts.length >= 2) {
+        const head = parts[0].trim().toLowerCase();
+        const rest = parseNums(parts.slice(1).join(DATA.delimiter));
+        if ((head in words) && rest !== null) { key = head; nums = rest; }
+      }
+    }
+    if (key in words) {
+      const code = words[key];
+      osc(R, DATA.word_addr, code);
+      if (nums === null) { R.afterWord = true; return [`${text}　→ 言葉（${code}）`, "w"]; }
+      R.afterWord = false;
+      sendValues(R, nums);
+      return [`${text}　→ 言葉（${code}）と数字 ${nums.join(", ")}`, "w"];
+    }
+    R.afterWord = false;
+    return [`${text}　→ 表にない行なので読み飛ばし`, "s"];
+  }
+  const exempt = R.afterWord;
+  R.afterWord = false;
+  if (!exempt && (now - R.lastSendT) < DATA.send_interval_ms / 1000) return [`${text}　→ 間隔が短いので落とした`, "i"];
+  R.lastSendT = now;
+  sendValues(R, values);
+  return [`${text}`, "n"];
+}
+
+// 1行を今の時刻（または決めた時刻 at）で届ける
+function feedLine(text, at) {
+  const t = (at === undefined) ? clock() : at;
+  updateTo(t);
+  const clean = String(text).replace(/\r/g, "").trim();
+  const r = routeLine(SIM.R, clean, t);
+  if (r) addLog(r[0], r[1], t);
+}
+
+// 決めた時刻の行を順に届け、最後に時計を now まで進める
+function tick(now) {
+  for (;;) {
+    while (SIM.queue.length && SIM.queue[0].at <= now) {
+      const e = SIM.queue.shift();
+      if (e.local) { addLog(e.text, "i", e.at); continue; }
+      feedLine(e.text, e.at);
+    }
+    if (!SIM.queue.length && SIM.testRepeat && SIM.lastTestEnd > 0 && now >= SIM.lastTestEnd + DATA.test.pause_sec) {
+      enqueueTest(SIM.lastTestEnd + DATA.test.pause_sec);   // 止まってから pause_sec あけて、次の走行
+      continue;
+    }
+    break;
+  }
+  updateTo(now);
+}
+
+function enqueueTest(start) {
+  const L = DATA.test.lines;
+  SIM.queue.push({ at: start, text: `--- テストの走行（${DATA.test.loops}ループ）を流します ---`, local: true });
+  for (const e of L) SIM.queue.push({ at: start + e.at, text: e.text });
+  SIM.lastTestEnd = start + L[L.length - 1].at;
+}
+
+// テキスト欄の行 → 時刻つきの列
+function planText(src, start) {
+  const out = [];
+  let t = start, lastMotion = false;
+  const motions = new Set(["front", "back", "left", "right", "stop"]);
+  const unit = SIM.rt.api.CFG.BP_DELAY_SEC_PER_UNIT;
+  const auto = document.getElementById("autoWait").checked;
+  for (const raw of src.split(/\n/)) {
+    const line = raw.trim();
+    if (line === "") continue;
+    const m = line.match(/^wait\s+([0-9.]+)$/i);
+    if (m) { out.push({ at: t, text: `wait ${m[1]}（${m[1]}秒待つ）`, local: true }); t += Number(m[1]); lastMotion = false; continue; }
+    out.push({ at: t, text: line });
+    const parts = line.split(DATA.delimiter).map((s) => s.trim());
+    const head = parts[0].toLowerCase();
+    if (motions.has(head) && parts.length >= 2 && auto) {
+      const v = Number(parts[1]); if (isFinite(v) && v > 0) t += v * unit;
+      lastMotion = false;
+    } else if (motions.has(head)) {
+      lastMotion = true;
+    } else if (lastMotion && auto) {
+      const v = Number(line); if (isFinite(v) && v > 0) t += v * unit;
+      lastMotion = false;
+    } else {
+      lastMotion = false;
+    }
+  }
+  return out;
+}
+
+// ============================================================================
+// 画面
+// ============================================================================
+const $id = (id) => document.getElementById(id);
+const COMPASS = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"];
+const RUN_COLOR_NAMES = ["オレンジ", "青", "緑", "紫"];
+
+function curSiteIdx() { const s = SIM.rt.store.site; return (s === undefined) ? SIM.rt.api.CFG.SITE_DEFAULT : s; }
+function curSite() { return SIM.rt.api.CFG.SITES[curSiteIdx()]; }
+
+// 町の (X, Z)m → マットの上の (x, y)cm（ItemScript の toW の逆）
+function toMat(X, Z) {
+  const C = SIM.rt.api.CFG, st = curSite();
+  const r = st.yaw * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+  const dx = X - st.cx, dz = Z - st.cz;
+  const k = 100 / C.SCALE;
+  return [(dx * c - dz * s) * k + C.MAT_CM / 2, (dx * s + dz * c) * k + C.MAT_CM / 2];
+}
+
+const VIEW = { lo: -17, hi: 137 };
+const cv = $id("map"), ctx = cv.getContext("2d");
+let PX = 1;
+function sx(x) { return (x - VIEW.lo) * PX; }
+function sy(y) { return (VIEW.hi - y) * PX; }
+
+function resizeCanvas() {
+  const r = cv.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(300, Math.round(r.width * dpr));
+  if (cv.width !== w) { cv.width = w; cv.height = w; }
+  PX = cv.width / (VIEW.hi - VIEW.lo);
+}
+
+function depthColor(L2) {
+  for (const [lim, , col] of DATA.depth_bins) if (L2 < lim) return col;
+  return DATA.depth_bins[DATA.depth_bins.length - 1][2];
+}
+
+function poly(pts) {
+  ctx.beginPath();
+  pts.forEach((p, i) => (i ? ctx.lineTo(sx(p[0]), sy(p[1])) : ctx.moveTo(sx(p[0]), sy(p[1]))));
+  ctx.closePath();
+}
+
+function roverCorners(b) {
+  const L = DATA.rover_mm[0] / 10, W = DATA.rover_mm[1] / 10;
+  const r = b.h * Math.PI / 180, fx = Math.sin(r), fy = Math.cos(r), rx = Math.cos(r), ry = -Math.sin(r);
+  return [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(([f, s]) =>
+    [b.x + fx * f * L / 2 + rx * s * W / 2, b.y + fy * f * L / 2 + ry * s * W / 2]);
+}
+
+function inPoly(p, pts) {
+  let ins = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const [xi, yi] = pts[i], [xj, yj] = pts[j];
+    if (((yi > p[1]) !== (yj > p[1])) && (p[0] < (xj - xi) * (p[1] - yi) / (yj - yi) + xi)) ins = !ins;
+  }
+  return ins;
+}
+function segX(a, b, c, d) {
+  const o = (p, q, r) => (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
+  return (o(a, b, c) > 0) !== (o(a, b, d) > 0) && (o(c, d, a) > 0) !== (o(c, d, b) > 0);
+}
+function hitsBuilding(b) {
+  if (TUNE_MODE) return false;
+  const rc = roverCorners(b);
+  for (const bd of DATA.sites[curSiteIdx()].buildings) {
+    if (rc.some((p) => inPoly(p, bd.p)) || bd.p.some((p) => inPoly(p, rc))) return true;
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) if (segX(rc[i], rc[(i + 1) % 4], bd.p[j], bd.p[(j + 1) % 4])) return true;
+  }
+  return false;
+}
+
+function draw() {
+  resizeCanvas();
+  const C = SIM.rt.api.CFG, N = SIM.rt.nodes, si = curSiteIdx(), S = DATA.sites[si], st = curSite();
+  const b = SIM.rt.store.bp, m = SIM.rt.store.map;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = "#e3dfd6"; ctx.fillRect(0, 0, cv.width, cv.height);
+  // マット
+  ctx.fillStyle = "#f6f4ee";
+  ctx.fillRect(sx(0), sy(C.MAT_CM), C.MAT_CM * PX, C.MAT_CM * PX);
+  // まだ確かめていないマス（灰色の板）
+  for (let r = 0; r < C.MAT_TILES; r++) for (let c = 0; c < C.MAT_TILES; c++) {
+    const nd = N["Fog_" + c + "_" + r];
+    if (SHOW.fog && !TUNE_MODE && nd && nd.enabled) {
+      ctx.fillStyle = "rgba(107,112,120,0.32)";
+      ctx.fillRect(sx(c * C.TILE_CM), sy((r + 1) * C.TILE_CM), C.TILE_CM * PX, C.TILE_CM * PX);
+    }
+  }
+  // 建物
+  // チューニング：10cm ごとの細い線と目もり（測った位置を読みやすく）
+  if (TUNE_MODE) {
+    ctx.strokeStyle = "rgba(42,47,54,0.16)"; ctx.lineWidth = Math.max(1, PX * 0.15);
+    for (let k = 10; k < C.MAT_CM; k += 10) {
+      if (k % C.TILE_CM === 0) continue;
+      ctx.beginPath(); ctx.moveTo(sx(k), sy(0)); ctx.lineTo(sx(k), sy(C.MAT_CM)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx(0), sy(k)); ctx.lineTo(sx(C.MAT_CM), sy(k)); ctx.stroke();
+    }
+    ctx.fillStyle = "#5b6670"; ctx.font = `${Math.round(PX * 2.3)}px Meiryo, sans-serif`; ctx.textBaseline = "middle";
+    for (let k = 0; k <= C.MAT_CM; k += 10) {
+      ctx.textAlign = "center"; ctx.fillText(String(k), sx(k), sy(-2.6));
+      ctx.textAlign = "right"; ctx.fillText(String(k), sx(-1.2), sy(k));
+    }
+  }
+  for (const bd of (TUNE_MODE ? [] : S.buildings)) {
+    poly(bd.p);
+    ctx.fillStyle = bd.school ? "rgba(232,138,10,0.88)" : depthColor(bd.L2);
+    ctx.globalAlpha = bd.school ? 1 : 0.92; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.lineWidth = Math.max(1, PX * 0.35); ctx.strokeStyle = "rgba(31,42,48,0.55)"; ctx.stroke();
+  }
+  // マスの線
+  ctx.strokeStyle = "#2a2f36";
+  for (let k = 0; k <= C.MAT_TILES; k++) {
+    ctx.lineWidth = Math.max(1, PX * ((k === 0 || k === C.MAT_TILES) ? 0.7 : 0.3));
+    ctx.beginPath(); ctx.moveTo(sx(k * C.TILE_CM), sy(0)); ctx.lineTo(sx(k * C.TILE_CM), sy(C.MAT_CM)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx(0), sy(k * C.TILE_CM)); ctx.lineTo(sx(C.MAT_CM), sy(k * C.TILE_CM)); ctx.stroke();
+  }
+  // A〜D・1〜4
+  ctx.fillStyle = "#1f2a30"; ctx.font = `bold ${Math.round(PX * 6)}px Meiryo, sans-serif`;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (let i = 0; i < C.MAT_TILES; i++) {
+    const c = (i + 0.5) * C.TILE_CM;
+    ctx.fillText("ABCDEFGH".charAt(i), sx(c), sy(-8));
+    ctx.fillText(String(i + 1), sx(-8), sy(c));
+  }
+  // ゴール（ミッションのときだけ）
+  const g = st.goal;
+  if (!TUNE_MODE) {
+  ctx.setLineDash([PX * 1.6, PX * 1.2]); ctx.lineWidth = Math.max(1.5, PX * 0.6);
+  ctx.strokeStyle = "#c0392b"; ctx.fillStyle = (m && m.arrived) ? "rgba(31,157,85,0.25)" : "rgba(192,57,43,0.12)";
+  ctx.beginPath(); ctx.arc(sx(g[0]), sy(g[1]), C.GOAL_R_CM * PX, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(sx(g[0]), sy(g[1])); ctx.lineTo(sx(g[0]), sy(g[1] + 9)); ctx.lineWidth = Math.max(1.5, PX * 0.5); ctx.strokeStyle = "#1f2a30"; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sx(g[0]), sy(g[1] + 9)); ctx.lineTo(sx(g[0] + 6), sy(g[1] + 7.3)); ctx.lineTo(sx(g[0]), sy(g[1] + 5.6)); ctx.closePath(); ctx.fillStyle = "#c0392b"; ctx.fill();
+  ctx.font = `bold ${Math.round(PX * 3.6)}px Meiryo, sans-serif`; ctx.fillStyle = "#c0392b";
+  ctx.textAlign = "left"; ctx.lineJoin = "round"; ctx.lineWidth = Math.max(2, PX * 0.9); ctx.strokeStyle = "#ffffff";
+  ctx.strokeText("ゴール", sx(g[0] + 7), sy(g[1] + 7.3)); ctx.fillText("ゴール", sx(g[0] + 7), sy(g[1] + 7.3));
+  }
+  // スタート
+  ctx.strokeStyle = "#1f2a30"; ctx.lineWidth = Math.max(1, PX * 0.4);
+  ctx.strokeRect(sx(C.START_X_CM - 3), sy(C.START_Y_CM + 3), 6 * PX, 6 * PX);
+  ctx.fillStyle = "#1f2a30"; ctx.textAlign = "center"; ctx.font = `bold ${Math.round(PX * 3.2)}px Meiryo, sans-serif`;
+  ctx.fillText("スタート", sx(C.START_X_CM), sy(C.START_Y_CM - 10.5));
+  // 水・がれき（表示を切り替えられる。計算は同じ）
+  for (let i = 0; SHOW.debris && !TUNE_MODE && i < C.WATER_POOL; i++) {
+    const nd = N["Water_" + i]; if (!nd || !nd.enabled || !nd.pos) continue;
+    const [x, y] = toMat(nd.pos.x, nd.pos.z), w = DATA.water_cm[0] / 2;
+    ctx.fillStyle = "rgba(90,180,240,0.55)"; ctx.fillRect(sx(x - w), sy(y + w), 2 * w * PX, 2 * w * PX);
+  }
+  for (let i = 0; SHOW.debris && !TUNE_MODE && i < C.RUBBLE_POOL; i++) {
+    const nd = N["Rubble_" + i]; if (!nd || !nd.enabled || !nd.pos) continue;
+    const [x, y] = toMat(nd.pos.x, nd.pos.z), w = DATA.rubble_cm[0] / 2;
+    ctx.beginPath(); ctx.moveTo(sx(x - w), sy(y - w * 0.6)); ctx.lineTo(sx(x + w), sy(y - w * 0.6)); ctx.lineTo(sx(x), sy(y + w * 0.8)); ctx.closePath();
+    ctx.fillStyle = "#8c5c33"; ctx.fill();
+  }
+  // 予定の道すじ（①の数字）
+  if (SHOW.preview && PREVIEW && PREVIEW.pts.length > 1) {
+    const P = PREVIEW;
+    ctx.save();
+    ctx.setLineDash([PX * 1.4, PX * 1.0]); ctx.lineWidth = Math.max(2, PX * 0.7); ctx.strokeStyle = "#1a3a5c"; ctx.lineJoin = "round";
+    ctx.beginPath(); P.pts.forEach((q, i) => (i ? ctx.lineTo(sx(q[0]), sy(q[1])) : ctx.moveTo(sx(q[0]), sy(q[1])))); ctx.stroke();
+    ctx.setLineDash([PX * 0.8, PX * 0.8]); ctx.lineWidth = Math.max(1.5, PX * 0.45);
+    poly(roverCorners(P.b)); ctx.stroke();
+    const r = P.b.h * Math.PI / 180;
+    ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(sx(P.b.x), sy(P.b.y)); ctx.lineTo(sx(P.b.x + Math.sin(r) * 7), sy(P.b.y + Math.cos(r) * 7)); ctx.stroke();
+    if (P.hit) {
+      const [hx, hy] = P.hit, k = 3;
+      ctx.strokeStyle = "#c0392b"; ctx.lineWidth = Math.max(2.5, PX * 0.9);
+      ctx.beginPath(); ctx.moveTo(sx(hx - k), sy(hy - k)); ctx.lineTo(sx(hx + k), sy(hy + k)); ctx.moveTo(sx(hx - k), sy(hy + k)); ctx.lineTo(sx(hx + k), sy(hy - k)); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // 本物のローバーが止まった所（測った値）
+  if (REAL.x !== null && REAL.y !== null) {
+    const rb = { x: REAL.x, y: REAL.y, h: REAL.h === null ? 0 : REAL.h };
+    ctx.save(); ctx.strokeStyle = "#c0392b"; ctx.lineWidth = Math.max(2, PX * 0.6);
+    if (REAL.h !== null) { poly(roverCorners(rb)); ctx.stroke();
+      const r = rb.h * Math.PI / 180; ctx.beginPath(); ctx.moveTo(sx(rb.x), sy(rb.y)); ctx.lineTo(sx(rb.x + Math.sin(r) * 9), sy(rb.y + Math.cos(r) * 9)); ctx.stroke(); }
+    const k = 2.2; ctx.beginPath(); ctx.moveTo(sx(rb.x - k), sy(rb.y - k)); ctx.lineTo(sx(rb.x + k), sy(rb.y + k)); ctx.moveTo(sx(rb.x - k), sy(rb.y + k)); ctx.lineTo(sx(rb.x + k), sy(rb.y - k)); ctx.stroke();
+    ctx.font = `bold ${Math.round(PX * 3.2)}px Meiryo, sans-serif`; ctx.fillStyle = "#c0392b"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    ctx.lineWidth = Math.max(2, PX * 0.8); ctx.strokeStyle = "#fff"; ctx.strokeText("本物", sx(rb.x + 3.5), sy(rb.y - 4)); ctx.fillText("本物", sx(rb.x + 3.5), sy(rb.y - 4));
+    ctx.restore();
+  }
+  // 通った跡
+  for (let c = 0; c < C.TRAIL_COLORS; c++) {
+    ctx.fillStyle = DATA.trail_colors[c];
+    for (let i = 0; i < C.TRAIL_POOL; i++) {
+      const nd = N["Trail" + c + "_" + i]; if (!nd || !nd.enabled || !nd.pos) continue;
+      const [x, y] = toMat(nd.pos.x, nd.pos.z);
+      ctx.beginPath(); ctx.arc(sx(x), sy(y), Math.max(2, PX * 0.9), 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  // ローバー（本物の大きさ 12×13cm）
+  if (b) {
+    const rc = roverCorners(b);
+    poly(rc); ctx.fillStyle = "rgba(31,42,48,0.92)"; ctx.fill();
+    ctx.lineWidth = Math.max(1.5, PX * 0.5); ctx.strokeStyle = "#ffffff"; ctx.stroke();
+    const r = b.h * Math.PI / 180, fx = Math.sin(r), fy = Math.cos(r);
+    ctx.beginPath();
+    ctx.moveTo(sx(b.x + fx * 7.5), sy(b.y + fy * 7.5));
+    ctx.lineTo(sx(b.x + fx * 1 + fy * 3.2), sy(b.y + fy * 1 - fx * 3.2));
+    ctx.lineTo(sx(b.x + fx * 1 - fy * 3.2), sy(b.y + fy * 1 + fx * 3.2));
+    ctx.closePath(); ctx.fillStyle = "#E88A0A"; ctx.fill();
+  }
+  $id("siteTitle").textContent = TUNE_MODE ? "チューニング：本物のローバーと同じように進むかを合わせる" : `${st.name}　${st.place}　ゴール：${st.goal_name}`;
+}
+
+function fmt1(v) { return (Math.round(v * 10) / 10).toFixed(1); }
+
+function renderStatus() {
+  const C = SIM.rt.api.CFG, b = SIM.rt.store.bp, m = SIM.rt.store.map, st = curSite(), now = SIM.rt.store.t || 0;
+  if (!b || !m) return;
+  const end = SIM.rt.api.moveEnd(b);
+  const moving = b.started && b.code !== 64 && now < end;
+  $id("sCmd").textContent = !b.started ? "まだ命令が来ていません"
+    : moving ? `${SIM.rt.api.NAMES[String(b.code)]}　${fmt1(Math.min(now, end) - b.cmdT)}秒`
+    : `止まって待っています（${SIM.rt.api.NAMES[String(b.code)]}${b.code === 64 ? "" : "が終わった"}）`;
+  $id("sPos").textContent = `(${fmt1(b.x)}, ${fmt1(b.y)}) cm`;
+  const out = b.x < 0 || b.y < 0 || b.x >= C.MAT_CM || b.y >= C.MAT_CM;
+  const hit = hitsBuilding(b);
+  $id("sTile").innerHTML = (out ? "マットの外" : "ABCDEFGH".charAt(Math.floor(b.x / C.TILE_CM)) + (Math.floor(b.y / C.TILE_CM) + 1))
+    + (hit ? '<br><span class="hit">建物にぶつかっています</span>' : "");
+  const deg = ((b.h % 360) + 360) % 360;
+  $id("sHead").textContent = `${COMPASS[Math.round(deg / 45) % 8]}（${fmt1(deg)}°）`;
+  const ci = ((b.run - 1) % C.TRAIL_COLORS + C.TRAIL_COLORS) % C.TRAIL_COLORS;
+  $id("sRun").innerHTML = b.run ? `<span class="chip" style="background:${DATA.trail_colors[ci]}"></span>${b.run}回目（跡：${RUN_COLOR_NAMES[ci]}）` : "0回";
+  $id("sGoal").innerHTML = TUNE_MODE ? "---（チューニング）" : m.arrived ? `<span class="arrive">★到着（${st.goal_name}）</span>` : `まだ（${st.goal_name}）`;
+  $id("sSpeed").textContent = `${fmt1(m.cms)} cm/秒・回る ${fmt1(m.dps)} 度/秒`;
+  $id("sMap").textContent = TUNE_MODE ? "---（チューニング）" : `調べたマス ${m.seenN}/${C.MAT_TILES * C.MAT_TILES}` + (SHOW.debris ? `・がれき ${m.rubbleN}・水 ${m.waterN}` : "");
+}
+
+function frame() {
+  if (!SIM.manual) tick(clock());
+  if (previewDirty) { previewDirty = false; PREVIEW = computePreview(); renderTuneOut(); renderCompare(); }
+  draw();
+  renderStatus();
+  requestAnimationFrame(frame);
+}
+
+// ---- ログ ----
+const LOG_MAX = 400;
+function addLog(text, cls, t) {
+  const el = $id("log");
+  const d = document.createElement("div");
+  d.className = cls || "";
+  const tt = (t === undefined) ? clock() : t;
+  d.textContent = `${tt.toFixed(2).padStart(7)}秒  ${text}`;
+  el.appendChild(d);
+  while (el.childNodes.length > LOG_MAX) el.removeChild(el.firstChild);
+  el.scrollTop = el.scrollHeight;
+}
+
+// ---- ミッション ----
+function buildMissions() {
+  const box = $id("missions");
+  const tb = document.createElement("button");
+  tb.className = "tune";
+  tb.innerHTML = "<b>チューニング</b><span>何もないマットで本物と合わせる</span>";
+  tb.onclick = () => selectSite(-1);
+  box.appendChild(tb);
+  DATA.sites.forEach((s, i) => {
+    const bt = document.createElement("button");
+    bt.innerHTML = `<b>${s.name}</b><span>${s.place}</span>`;
+    bt.onclick = () => selectSite(i);
+    box.appendChild(bt);
+  });
+}
+// i = -1 でチューニング（計算はミッション1の場所のまま。建物・ゴール・がれき・水・灰色のマスを出さない）
+function selectSite(i) {
+  updateTo(clock());
+  TUNE_MODE = (i < 0);
+  SIM.rt.h.recv("site", TUNE_MODE ? 0 : i, null);   // cluster のミッションのパネルと同じ（最初からやり直す）
+  updateModeUI();
+  addLog(TUNE_MODE ? "--- チューニングを始めました ---" : `--- ${DATA.sites[i].name}（${DATA.sites[i].place}）を始めました ---`, "i");
+  schedulePreview();
+}
+
+function updateModeUI() {
+  const idx = TUNE_MODE ? 0 : curSiteIdx() + 1;
+  [...$id("missions").children].forEach((b, k) => b.classList.toggle("sel", k === idx));
+  $id("tgDebris").parentElement.style.display = TUNE_MODE ? "none" : "";
+  $id("tgFog").parentElement.style.display = TUNE_MODE ? "none" : "";
+  $id("cmpCard").style.display = TUNE_MODE ? "" : "none";
+  cv.style.cursor = TUNE_MODE ? "crosshair" : "default";
+  buildLegend();
+}
+
+function buildLegend() {
+  const L = $id("legend"); const items = [];
+  if (!TUNE_MODE) {
+    items.push(`<span><b style="background:#E88A0A"></b>学校の校舎</span>`);
+    DATA.depth_bins.forEach(([, lab, col]) => items.push(`<span><b style="background:${col}"></b>建物（浸水 ${lab}）</span>`));
+    items.push(`<span><b style="background:rgba(107,112,120,0.32)"></b>まだ調べていないマス</span>`);
+  }
+  DATA.trail_colors.forEach((c, i) => items.push(`<span><b style="background:${c};border-radius:50%"></b>${i + 1}回目の跡</span>`));
+  if (!TUNE_MODE) {
+    items.push(`<span><b style="background:rgba(90,180,240,0.55)"></b>水（water）</span>`);
+    items.push(`<span><b style="background:#8c5c33"></b>がれき（wall）</span>`);
+  } else {
+    items.push(`<span><b style="background:#fff;border:2px solid #c0392b"></b>本物のローバーが止まった所</span>`);
+  }
+  items.push(`<span><b style="background:#fff;border:2px dashed #1a3a5c"></b>予定の道すじ（①の数字）</span>`);
+  L.innerHTML = items.join("") + `<div style="width:100%;margin-top:2px">${TUNE_MODE ? "細い線は 10cm ごとです。" : "建物の中はローバーが走れない所です。"}黒い四角がローバー（本物と同じ 12×13cm）で、オレンジの三角が前です。</div>`;
+}
+
+// ---- Web Serial ----
+const SER = { port: null, reader: null, closed: null, buf: "" };
+async function connect() {
+  if (!("serial" in navigator)) { alert("このブラウザではボードにつなげません。Chrome か Edge で開いてください。"); return; }
+  try {
+    const port = await navigator.serial.requestPort();
+    await port.open({ baudRate: DATA.baud });
+    SER.port = port; SER.buf = "";
+    setConn(true);
+    addLog(`--- ボードにつなぎました（${DATA.baud}bps） ---`, "i");
+    readLoop();
+  } catch (e) {
+    if (e && e.name !== "NotFoundError") addLog(`つなげませんでした：${e.message || e}`, "s");
+  }
+}
+async function readLoop() {
+  const dec = new TextDecoderStream();
+  SER.closed = SER.port.readable.pipeTo(dec.writable).catch(() => {});
+  SER.reader = dec.readable.getReader();
+  try {
+    while (true) {
+      const { value, done } = await SER.reader.read();
+      if (done) break;
+      SER.buf += value;
+      let k;
+      while ((k = SER.buf.indexOf("\n")) >= 0) {
+        const line = SER.buf.slice(0, k); SER.buf = SER.buf.slice(k + 1);
+        feedLine(line);
+      }
+    }
+  } catch (e) {
+    addLog(`ボードとの通信が切れました：${e.message || e}`, "s");
+  }
+  await disconnect(true);
+}
+async function disconnect(fromLoop) {
+  const port = SER.port; if (!port) return;
+  SER.port = null;
+  try { if (SER.reader && !fromLoop) await SER.reader.cancel(); } catch (e) {}
+  try { await SER.closed; } catch (e) {}
+  try { await port.close(); } catch (e) {}
+  SER.reader = null;
+  setConn(false);
+  addLog("--- ボードを切りました ---", "i");
+}
+function setConn(on) {
+  $id("conn").textContent = on ? `つないでいます（${DATA.baud}bps）` : "つないでいません";
+  $id("conn").classList.toggle("on", on);
+  $id("btnConnect").disabled = on; $id("btnDisconnect").disabled = !on;
+}
+
+// ============================================================================
+// ① 数字を変えて試す（チューニング）
+//   speed・turn と命令の並び → シリアルの行（ボードが出すはずの形）→ 同じ計算で予定の道すじを出す
+// ============================================================================
+const MOTIONS = [["front", "前進"], ["back", "後退"], ["left", "左回り"], ["right", "右回り"], ["stop", "停止"]];
+const TUNE = { speed: 10, turn: 45, name: "まっすぐ", steps: [["front", 3], ["stop", 0]] };
+const SHOW = { preview: true, debris: true, fog: true };
+let TUNE_MODE = true;   // チューニング（何もないマット）。false のときはミッション
+const REAL = { x: null, y: null, h: null };
+const RECORDS = [];
+const PRESETS = [
+  ["まっすぐ", "前進 3秒", [["front", 3], ["stop", 0]]],
+  ["後ろへ", "後退 2秒", [["back", 2], ["stop", 0]]],
+  ["右に回る", "右回り 2秒", [["right", 2], ["stop", 0]]],
+  ["左に回る", "左回り 2秒", [["left", 2], ["stop", 0]]],
+  ["進んで右", "前進・右回り・前進", [["front", 3], ["right", 2], ["front", 3], ["stop", 0]]],
+  ["進んで左", "前進・左回り・前進", [["front", 3], ["left", 2], ["front", 3], ["stop", 0]]],
+  ["四角", "前進と右回りを4回", [["front", 2], ["right", 2], ["front", 2], ["right", 2], ["front", 2], ["right", 2], ["front", 2], ["right", 2], ["stop", 0]]],
+  ["Uターン", "前進・右回り4秒・前進", [["front", 3], ["right", 4], ["front", 3], ["stop", 0]]]
+];
+let PREVIEW = null, previewDirty = true;
+
+// シリアルの行（言葉と数字を2行に分けた形）と、その行を出す時刻（秒）
+function tuneLines() {
+  const unit = SIM.rt.api.CFG.BP_DELAY_SEC_PER_UNIT;
+  const out = [];
+  let t = 0;
+  out.push({ at: t, text: "speed" }, { at: t, text: fmtNum(TUNE.speed) });
+  out.push({ at: t, text: "turn" }, { at: t, text: fmtNum(TUNE.turn) });
+  for (const [w, sec] of TUNE.steps) {
+    out.push({ at: t, text: w }, { at: t, text: fmtNum(sec) });
+    t += Math.max(0, sec) * unit;
+  }
+  return out;
+}
+function fmtNum(v) { return String(Math.round(Number(v) * 1000) / 1000); }
+
+function tuneValid() {
+  return TUNE.speed > 0 && TUNE.turn > 0 && TUNE.steps.length > 0 && TUNE.steps.every(([, s]) => isFinite(s) && s >= 0);
+}
+
+// 別の ItemScript を動かして、①の数字で走ったときの道すじを先に計算する（cluster と同じ計算）
+function computePreview() {
+  if (!tuneValid()) return null;
+  const rt = makeRuntime(() => {});
+  rt.h.start();
+  rt.h.recv("site", curSiteIdx(), null);
+  const R = makeRouter(rt);
+  const lines = tuneLines();
+  const C = rt.api.CFG, dt = 1 / 60;
+  const q = lines.slice(), pts = [];
+  let T = 0, hit = null, out = false, endT = null;
+  const tEnd = lines[lines.length - 1].at + 30;
+  while (T < tEnd) {
+    T += dt;
+    while (q.length && q[0].at <= T) { const e = q.shift(); updateTo(e.at, rt); routeLine(R, e.text, e.at); }
+    updateTo(T, rt);
+    const b = rt.store.bp;
+    if (b.started) {
+      const last = pts[pts.length - 1];
+      if (!last || Math.hypot(last[0] - b.x, last[1] - b.y) > 0.3 || last[2] !== b.h) pts.push([b.x, b.y, b.h]);
+      if (!hit && hitsBuilding(b)) hit = [b.x, b.y];
+      if (b.x < 0 || b.y < 0 || b.x > C.MAT_CM || b.y > C.MAT_CM) out = true;
+    }
+    if (!q.length && b.started && T > rt.api.holdEnd(b) + 0.2) { endT = rt.api.moveEnd(b); break; }
+  }
+  const b = rt.store.bp, m = rt.store.map, g = rt.api.CFG.SITES[curSiteIdx()].goal;
+  pts.push([b.x, b.y, b.h]);
+  return { pts, b, arrived: m.arrived, hit, out, endT, goalD: Math.hypot(b.x - g[0], b.y - g[1]) };
+}
+
+function schedulePreview() { previewDirty = true; }
+
+function renderTuneOut() {
+  const el = $id("tOut");
+  if (!tuneValid()) { el.innerHTML = '<span class="bad">速さ・回る速さは 0 より大きく、秒は 0 以上にしてください</span>'; return; }
+  const P = PREVIEW; if (!P) return;
+  const C = SIM.rt.api.CFG, b = P.b;
+  const deg = ((b.h % 360) + 360) % 360;
+  const tile = (b.x < 0 || b.y < 0 || b.x >= C.MAT_CM || b.y >= C.MAT_CM) ? "マットの外"
+    : "ABCDEFGH".charAt(Math.floor(b.x / C.TILE_CM)) + (Math.floor(b.y / C.TILE_CM) + 1);
+  const lines = [];
+  lines.push(`止まる所：<b>(${fmt1(b.x)}, ${fmt1(b.y)}) cm・${tile}・${COMPASS[Math.round(deg / 45) % 8]}向き</b>（${fmt1(P.endT)}秒）`);
+  if (!TUNE_MODE) lines.push(P.arrived ? '<span class="good">★ゴールに着きます</span>'
+    : `ゴールまで あと <b>${fmt1(Math.max(0, P.goalD - C.GOAL_R_CM))} cm</b>（中心から ${C.GOAL_R_CM}cm 以内で到着）`);
+  if (P.hit) lines.push('<span class="bad">建物にぶつかる所があります（地図の赤い×）</span>');
+  if (P.out) lines.push('<span class="bad">マットの外に出ます</span>');
+  el.innerHTML = lines.join("<br>");
+}
+
+function renderTuneLines() {
+  $id("tLines").textContent = tuneLines().map((l) => l.text).join("\n");
+}
+
+function buildTuneUI() {
+  $id("tSpeed").value = TUNE.speed;
+  $id("tTurn").value = TUNE.turn;
+  const box = $id("tSteps");
+  box.innerHTML = "";
+  TUNE.steps.forEach(([w, sec], i) => {
+    const row = document.createElement("div");
+    row.className = "tunerow";
+    const opts = MOTIONS.map(([k, jp]) => `<option value="${k}"${k === w ? " selected" : ""}>${jp}</option>`).join("");
+    row.innerHTML = `<span class="no">${i + 1}</span><select>${opts}</select><input type="number" min="0" step="0.1" value="${sec}"><span>秒</span><button class="x" title="この命令を消す">×</button>`;
+    row.querySelector("select").onchange = (e) => { TUNE.steps[i][0] = e.target.value; stepsEdited(); };
+    row.querySelector("input").oninput = (e) => { TUNE.steps[i][1] = Number(e.target.value); stepsEdited(); };
+    row.querySelector("button").onclick = () => { TUNE.steps.splice(i, 1); buildTuneUI(); stepsEdited(); };
+    box.appendChild(row);
+  });
+}
+
+function tuneChanged() { schedulePreview(); renderTuneLines(); }
+function stepsEdited() { TUNE.name = "自分で作った並び"; markPreset(); tuneChanged(); }
+
+function buildPresets() {
+  const box = $id("presets");
+  PRESETS.forEach(([name, sub, steps]) => {
+    const bt = document.createElement("button");
+    bt.innerHTML = `${name}<small>${sub}</small>`;
+    bt.onclick = () => {
+      TUNE.name = name; TUNE.steps = JSON.parse(JSON.stringify(steps));
+      REAL.x = REAL.y = REAL.h = null; showReal();   // パターンを変えたら測り直す
+      buildTuneUI(); markPreset(); tuneChanged();
+    };
+    box.appendChild(bt);
+  });
+  markPreset();
+}
+function markPreset() { [...$id("presets").children].forEach((b, k) => b.classList.toggle("sel", PRESETS[k][0] === TUNE.name)); }
+
+// この数字で走らせる：前の走行が止まってから BP_RESET_SEC より長くあけて、新しい走行として流す
+function runTune() {
+  if (!tuneValid()) return;
+  SIM.queue = []; SIM.testRepeat = false; SIM.lastTestEnd = 0;
+  const C = SIM.rt.api.CFG, now = clock(), b = SIM.rt.store.bp;
+  let start = now;
+  if (b && b.started) {
+    const need = SIM.rt.api.holdEnd(b) + C.BP_RESET_SEC + 0.05;
+    if (need > now) {
+      start = need;
+      addLog(`--- 前の走行が止まってから5秒あけて始めます（あと ${fmt1(need - now)}秒） ---`, "i");
+    }
+  }
+  SIM.queue.push({ at: start, text: "--- ①の数字で走らせます ---", local: true });
+  for (const l of tuneLines()) SIM.queue.push({ at: start + l.at, text: l.text });
+}
+
+
+// ---- 本物のローバーと比べる ----
+function normDeg180(h) { return ((h % 360) + 540) % 360 - 180; }
+function showReal() {
+  $id("rX").value = REAL.x === null ? "" : REAL.x;
+  $id("rY").value = REAL.y === null ? "" : REAL.y;
+  $id("rH").value = REAL.h === null ? "" : REAL.h;
+}
+// パターンの種類：まっすぐだけ／回るだけ／まざっている
+function patternKind() {
+  const mv = TUNE.steps.filter(([w, s]) => w !== "stop" && s > 0).map(([w]) => w);
+  if (mv.length && mv.every((w) => w === "front" || w === "back")) return "straight";
+  if (mv.length && mv.every((w) => w === "left" || w === "right")) return "turn";
+  return "mixed";
+}
+function compareNow() {
+  const P = PREVIEW;
+  if (!P || REAL.x === null || REAL.y === null) return null;
+  const C = SIM.rt.api.CFG;
+  const dx = REAL.x - P.b.x, dy = REAL.y - P.b.y;
+  const r = { d: Math.hypot(dx, dy), dx, dy, dh: REAL.h === null ? null : normDeg180(REAL.h - P.b.h), sug: null };
+  const kind = patternKind();
+  if (kind === "straight") {
+    const sim = Math.hypot(P.b.x - C.START_X_CM, P.b.y - C.START_Y_CM);
+    const real = Math.hypot(REAL.x - C.START_X_CM, REAL.y - C.START_Y_CM);
+    if (sim > 1) r.sug = ["speed", TUNE.speed * real / sim];
+  } else if (kind === "turn" && r.dh !== null) {
+    // 回る時間＝秒数＋命令ごとの待ち（BP_LOOP_MS。ブロックの赤外線送信のあとの delay(500)）。2026-11-07
+    const turnSec = (sec) => sec * C.BP_DELAY_SEC_PER_UNIT + C.BP_LOOP_MS / 1000;
+    const sim = TUNE.steps.reduce((a, [w, s]) => a + (w === "right" ? turnSec(s) : w === "left" ? -turnSec(s) : 0), 0) * TUNE.turn;
+    const real = sim + r.dh;
+    if (Math.abs(sim) > 1 && real * sim > 0) r.sug = ["turn", TUNE.turn * real / sim];
+  }
+  return r;
+}
+function renderCompare() {
+  const el = $id("cOut");
+  const r = compareNow();
+  if (!r) { el.innerHTML = "本物のローバーが止まった所を入れると、点線の終点とのずれが出ます。"; return; }
+  const dir = (v, p, n) => (Math.abs(v) < 0.05 ? "" : (v > 0 ? p : n) + " " + fmt1(Math.abs(v)) + "cm");
+  const parts = [dir(r.dx, "東へ", "西へ"), dir(r.dy, "北へ", "南へ")].filter(Boolean).join("・");
+  const lines = [];
+  lines.push(`位置のずれ：<b>${fmt1(r.d)} cm</b>${parts ? `（本物は点線より ${parts}）` : ""}`);
+  if (r.dh !== null) lines.push(`向きのずれ：<b>${fmt1(Math.abs(r.dh))}°</b>${Math.abs(r.dh) < 0.05 ? "" : `（本物は点線より${r.dh > 0 ? "右" : "左"}を向いている）`}`);
+  const kind = patternKind();
+  if (r.sug) {
+    const [k, v] = r.sug;
+    const v1 = Math.round(v * 10) / 10;
+    lines.push(`目安：${k === "speed" ? "速さ speed" : "回る速さ turn"} を <b>${v1}</b> にすると合います　<button id="cApply" style="padding:2px 8px">${v1} にする</button>`);
+  } else if (kind === "mixed") {
+    lines.push('<span style="color:#5b6670">まっすぐ・回るのパターンで speed と turn を先に合わせてから、このパターンで確かめると分かりやすいです。</span>');
+  } else if (kind === "turn" && r.dh === null) {
+    lines.push('<span style="color:#5b6670">回るパターンは、向きを入れると turn の目安が出ます。</span>');
+  }
+  el.innerHTML = lines.join("<br>");
+  const ap = $id("cApply");
+  if (ap) ap.onclick = () => {
+    const [k, v] = r.sug, v1 = Math.round(v * 10) / 10;
+    TUNE[k] = v1; $id(k === "speed" ? "tSpeed" : "tTurn").value = v1; tuneChanged();
+  };
+}
+function addRecord() {
+  const r = compareNow();
+  if (!r) { addLog("--- 記録するには、本物のローバーが止まった所を入れてください ---", "i"); return; }
+  RECORDS.push({ name: TUNE.name, speed: TUNE.speed, turn: TUNE.turn, d: r.d, dh: r.dh });
+  if (RECORDS.length > 12) RECORDS.shift();
+  renderRecords();
+}
+function renderRecords() {
+  const t = $id("recTable");
+  if (!RECORDS.length) { t.innerHTML = ""; return; }
+  t.innerHTML = "<tr><th>パターン</th><th>speed・turn</th><th>位置のずれ</th><th>向きのずれ</th></tr>" +
+    RECORDS.map((r) => `<tr><td>${r.name}</td><td>${fmtNum(r.speed)}・${fmtNum(r.turn)}</td><td>${fmt1(r.d)}cm</td><td>${r.dh === null ? "---" : fmt1(Math.abs(r.dh)) + "°"}</td></tr>`).join("");
+}
+
+// ---- 起動 ----
+function init() {
+  boot();
+  buildMissions(); updateModeUI();
+  $id("credit").innerHTML = `<div>${DATA.credit}</div><div>ローバー シミュレーター v${DATA.version}（cluster のローバー地図と同じ計算）</div>`;
+  $id("multi").value = "speed, 10\nturn, 45\nfront\n2\nright\n2\nfront\n3\nstop\n0";
+  if (!("serial" in navigator)) $id("serialNote").innerHTML = '<b style="color:#c0392b">このブラウザではボードにつなげません。Chrome か Edge で開いてください。</b>（下の「ボードなしで試す」は使えます）';
+  buildPresets(); buildTuneUI(); renderTuneLines(); renderRecords();
+  const realIn = (k, id) => { $id(id).oninput = (e) => { const v = e.target.value.trim(); REAL[k] = v === "" ? null : Number(v); renderCompare(); }; };
+  realIn("x", "rX"); realIn("y", "rY"); realIn("h", "rH");
+  $id("cRec").onclick = addRecord;
+  $id("cClear").onclick = () => { REAL.x = REAL.y = REAL.h = null; showReal(); renderCompare(); };
+  cv.addEventListener("click", (e) => {   // 地図をクリック → 本物の位置（チューニングのとき）
+    if (!TUNE_MODE) return;
+    const rect = cv.getBoundingClientRect();
+    const x = VIEW.lo + (e.clientX - rect.left) / rect.width * (VIEW.hi - VIEW.lo);
+    const y = VIEW.hi - (e.clientY - rect.top) / rect.height * (VIEW.hi - VIEW.lo);
+    REAL.x = Math.round(x * 2) / 2; REAL.y = Math.round(y * 2) / 2; showReal(); renderCompare();
+  });
+  $id("tSpeed").oninput = (e) => { TUNE.speed = Number(e.target.value); tuneChanged(); };
+  $id("tTurn").oninput = (e) => { TUNE.turn = Number(e.target.value); tuneChanged(); };
+  $id("tAdd").onclick = () => { TUNE.steps.push(["front", 1]); buildTuneUI(); tuneChanged(); };
+  $id("tRun").onclick = runTune;
+  $id("tStop").onclick = () => { SIM.queue = []; SIM.testRepeat = false; SIM.lastTestEnd = 0; addLog("--- 流すのを止めました ---", "i"); };
+  $id("tCopy").onclick = async () => {
+    const txt = $id("tLines").textContent;
+    try { await navigator.clipboard.writeText(txt); addLog("--- 行をコピーしました ---", "i"); }
+    catch (e) { const r = document.createRange(); r.selectNodeContents($id("tLines")); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+  };
+  $id("tgPreview").onchange = (e) => { SHOW.preview = e.target.checked; };
+  $id("tgDebris").onchange = (e) => { SHOW.debris = e.target.checked; };
+  $id("tgFog").onchange = (e) => { SHOW.fog = e.target.checked; };
+  $id("btnConnect").onclick = connect;
+  $id("btnDisconnect").onclick = () => disconnect(false);
+  $id("btnReset").onclick = () => selectSite(curSiteIdx());
+  $id("btnHome").onclick = () => { SIM.rt.api.goHome(); if (typeof renderStatus === "function") renderStatus(); };
+  $id("btnClearLog").onclick = () => { $id("log").innerHTML = ""; };
+  $id("oneLine").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { const v = e.target.value; if (v.trim() !== "") feedLine(v); e.target.value = ""; }
+  });
+  $id("btnRunText").onclick = () => { SIM.queue = []; SIM.testRepeat = false; SIM.lastTestEnd = 0; SIM.queue.push(...planText($id("multi").value, clock())); };
+  $id("btnTest").onclick = () => { SIM.queue = []; SIM.testRepeat = $id("testRepeat").checked; enqueueTest(clock()); };
+  $id("testRepeat").onchange = (e) => { SIM.testRepeat = e.target.checked && SIM.lastTestEnd > 0; };
+  $id("btnStopFlow").onclick = () => { SIM.queue = []; SIM.testRepeat = false; SIM.lastTestEnd = 0; addLog("--- 流すのを止めました ---", "i"); };
+  window.addEventListener("resize", () => draw());
+  if (location.hash === "#manual") SIM.manual = true;
+  requestAnimationFrame(frame);
+}
+
+// 確かめ用（時計を手で進める）：location.hash = "#manual" で開き、SIMTEST を使う
+window.SIMTEST = {
+  restart() { SIM.manual = true; SIM.manualT = 0; SIM.queue = []; SIM.testRepeat = false; SIM.lastTestEnd = 0; boot(); schedulePreview(); },
+  step(dt) { SIM.manualT += dt; tick(SIM.manualT); },
+  test(repeat) { SIM.testRepeat = !!repeat; enqueueTest(SIM.manualT); },
+  enqueue(list) { for (const e of list) SIM.queue.push({ at: e.at, text: e.text }); SIM.queue.sort((a, b) => a.at - b.at); },
+  site(i) { selectSite(i); },
+  line(text) { feedLine(text, SIM.manualT); },
+  tune(t) { if (t) { Object.assign(TUNE, JSON.parse(JSON.stringify(t))); buildTuneUI(); tuneChanged(); } PREVIEW = computePreview(); previewDirty = false; renderTuneOut(); return { b: PREVIEW.b, arrived: PREVIEW.arrived, endT: PREVIEW.endT, hit: PREVIEW.hit, out: PREVIEW.out }; },
+  runTune() { runTune(); },
+  real(x, y, h) { REAL.x = x; REAL.y = y; REAL.h = h; showReal(); renderCompare(); return compareNow(); },
+  mode(i) { selectSite(i); },
+  tuneLines() { return tuneLines(); },
+  state() { const b = SIM.rt.store.bp, m = SIM.rt.store.map; return { t: SIM.rt.store.t, b, m, holdEnd: SIM.rt.api.holdEnd(b), site: curSiteIdx() }; }
+};
+
+init();
+</script>
+</body>
+</html>
