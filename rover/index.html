@@ -723,6 +723,7 @@ $.onStart(() => {
 $.onReceive((messageType, arg, sender) => {
   if (messageType === "word") { onWord(arg); return; }
   if (messageType === "delay") { onDelay(arg); return; }
+  if (messageType === "home") { goHome(); return; }   // 展望台の真ん中のパネル：跡は残してローバーだけスタートへ
   if (messageType === "site") {
     const i = Math.round(Number(arg));
     if (i >= 0 && i < CFG.SITES.length) resetAll(i);
